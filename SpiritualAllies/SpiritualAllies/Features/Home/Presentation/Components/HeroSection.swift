@@ -7,12 +7,21 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct HeroSection: View {
     let hero: HomeHero
     @Binding var searchText: String
     var onSeek: () -> Void = {}
     var onPromptTap: (String) -> Void = { _ in }
+
+    private var topSafeAreaInset: CGFloat {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }?
+            .safeAreaInsets.top ?? 0
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
@@ -59,67 +68,67 @@ struct HeroSection: View {
     }
 
     private var heroCard: some View {
-        ZStack(alignment: .top) {
-            // Background layers bleed past the top safe area so the photo
-            // sits behind the status bar / notch, edge-to-edge.
-            GeometryReader { proxy in
-                RemoteImage(path: hero.heroImagePath)
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                    .clipped()
-            }
-            .ignoresSafeArea(edges: .top)
+        GeometryReader { proxy in
+            ZStack(alignment: .top) {
+                ZStack {
+                    RemoteImage(path: hero.heroImagePath)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .clipped()
 
-            LinearGradient(
-                colors: [
-                    Color.black.opacity(0.12),
-                    AppColor.primaryDark.opacity(0.05),
-                    AppColor.primaryDark.opacity(0.42),
-                    AppColor.primaryDark.opacity(0.90)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-
-            // Foreground content stays within the safe area, so the logo
-            // and bell never sit under the notch/status bar.
-            VStack(alignment: .leading, spacing: 0) {
-                header
-                    .padding(.horizontal, 20)
-                    .padding(.top, AppSpacing.sm)
-
-                Spacer(minLength: 0)
-
-                VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                    Text(hero.eyebrow.uppercased())
-                        .font(AppFont.eyebrow(11))
-                        .tracking(2.4)
-                        .foregroundStyle(AppColor.accentSoft)
-                        .padding(.horizontal, AppSpacing.md)
-                        .padding(.vertical, 6)
-                        .background(Capsule().fill(Color.white.opacity(0.12)))
-
-                    Text(hero.title)
-                        .font(AppFont.title(24))
-                        .foregroundStyle(AppColor.onDark)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(hero.subtitle)
-                        .font(AppFont.body(14))
-                        .foregroundStyle(AppColor.onDarkSecondary)
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    searchBar
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.12),
+                            AppColor.primaryDark.opacity(0.05),
+                            AppColor.primaryDark.opacity(0.42),
+                            AppColor.primaryDark.opacity(0.90)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 20)
-                .padding(.trailing, 12)
+                .ignoresSafeArea(edges: .top)
+
+                VStack(alignment: .leading, spacing: 0) {
+                    header
+                        .padding(.horizontal, 20)
+                        .padding(.top, 12)
+
+                    Spacer(minLength: 0)
+
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        Text(hero.eyebrow.uppercased())
+                            .font(AppFont.eyebrow(11))
+                            .tracking(2.4)
+                            .foregroundStyle(AppColor.accentSoft)
+                            .padding(.horizontal, AppSpacing.md)
+                            .padding(.vertical, 6)
+                            .background(Capsule().fill(Color.white.opacity(0.12)))
+
+                        Text(hero.title)
+                            .font(AppFont.title(24))
+                            .foregroundStyle(AppColor.onDark)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text(hero.subtitle)
+                            .font(AppFont.body(14))
+                            .foregroundStyle(AppColor.onDarkSecondary)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        searchBar
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
+                    .padding(.trailing, 12)
+                }
+                .padding(.top, topSafeAreaInset)
             }
+            .frame(width: proxy.size.width, height: proxy.size.height)
         }
         .frame(height: 480)
+        .ignoresSafeArea(edges: .top)
     }
 
     private var searchBar: some View {

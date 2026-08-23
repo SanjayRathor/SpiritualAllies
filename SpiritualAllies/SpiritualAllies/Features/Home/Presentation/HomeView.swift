@@ -56,6 +56,7 @@ struct HomeView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 120)
         }
+        .ignoresSafeArea(edges: .top)
     }
 
     private func errorView(_ message: String) -> some View {
