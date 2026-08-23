@@ -32,12 +32,10 @@ class ToastHelper {
     
     static func showLoading(with message:String = "") {
         DispatchQueue.main.async {
-            ProgressHUD.animationType = .horizontalBarScaling
-            ProgressHUD.colorHUD = Color(uiColor: UIColor { traits in
-                traits.userInterfaceStyle == .dark
-                    ? UIColor(red: 22 / 255, green: 31 / 255, blue: 34 / 255, alpha: 1)
-                    : .white
-            })
+            ProgressHUD.animationType = .circleStrokeSpin
+            ProgressHUD.mediaSize = 28
+            ProgressHUD.colorBackground = .clear
+            ProgressHUD.colorHUD = .clear
             ProgressHUD.colorAnimation = AppColors.accent
             ProgressHUD.colorProgress = AppColors.accent
             guard message.count > 0 else {

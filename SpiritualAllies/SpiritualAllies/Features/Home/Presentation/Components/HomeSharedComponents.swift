@@ -37,15 +37,15 @@ struct TagChip: View {
     let text: String
     var body: some View {
         Text(text)
-            .font(AppFont.caption(13))
-            .foregroundStyle(AppColor.textPrimary)
-            .padding(.horizontal, AppSpacing.md)
-            .padding(.vertical, AppSpacing.sm)
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundStyle(AppColor.primaryDark.opacity(0.92))
+            .padding(.horizontal, 24)
+            .padding(.vertical, 14)
             .background(
                 Capsule().fill(Color.white)
             )
             .overlay(
-                Capsule().stroke(AppColor.cardStroke, lineWidth: 1)
+                Capsule().stroke(AppColor.cardStroke.opacity(0.8), lineWidth: 1)
             )
     }
 }

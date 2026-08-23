@@ -42,7 +42,7 @@ struct HomeView: View {
 
     private func dashboardScroll(_ dashboard: HomeDashboard) -> some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: AppSpacing.xl) {
+            LazyVStack(alignment: .leading, spacing: 20) {
                 HeroSection(hero: dashboard.hero, searchText: $viewModel.searchText)
 
                 StatsSection(stats: dashboard.stats)
