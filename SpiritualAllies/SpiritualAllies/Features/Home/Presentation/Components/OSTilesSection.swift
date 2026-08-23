@@ -18,15 +18,15 @@ struct OSTilesSection: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 34) {
+        VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 14) {
                 Text(section.eyebrow.uppercased())
-                    .font(.system(size: 15, weight: .bold, design: .monospaced))
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
                     .tracking(4.5)
                     .foregroundStyle(AppColor.textSecondary.opacity(0.9))
 
                 Text(section.title)
-                    .font(.system(size: 31, weight: .bold, design: .serif))
+                    .font(.system(size: 22, weight: .bold, design: .serif))
                     .foregroundStyle(AppColor.textPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
@@ -46,7 +46,7 @@ struct OSTilesSection: View {
             }
         }
         .padding(.horizontal, 26)
-        .padding(.top, 4)
+        .padding(.top, 14)
     }
 
     private func tile(_ tile: HomeOSTile, height: CGFloat, featured: Bool) -> some View {
@@ -78,27 +78,27 @@ struct OSTilesSection: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(tile.title)
-                    .font(.system(size: featured ? 20 : 15, weight: .bold, design: .serif))
+                    .font(.system(size: featured ? 20 : 14, weight: .bold, design: .serif))
                     .foregroundStyle(AppColor.onDark)
                     .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
+                    .fixedSize(horizontal: false, vertical: false)
                 Text(tile.subtitle)
-                    .font(.system(size: featured ? 18 : 13, weight: .medium))
+                    .font(.system(size: featured ? 18 : 12, weight: .medium))
                     .foregroundStyle(AppColor.onDarkSecondary)
                     .lineLimit(featured ? 3 : 3)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(18)
-            .padding(.trailing, 52)
+            .padding(.trailing, 28)
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(AppColor.accentSoft)
-                .frame(width: 36, height: 36)
+                .frame(width: 20, height: 20)
                 .background(Circle().fill(Color.black.opacity(0.28)))
-                .padding(.top, 18)
-                .padding(.trailing, 18)
+                .padding(.top, 16)
+                .padding(.trailing, 16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         }
         .frame(height: height)
