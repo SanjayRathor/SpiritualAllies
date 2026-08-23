@@ -13,39 +13,43 @@ struct OSTilesSection: View {
     var onTap: (HomeOSTile) -> Void = { _ in }
 
     private let columns = [
-        GridItem(.flexible(), spacing: AppSpacing.md),
-        GridItem(.flexible(), spacing: AppSpacing.md)
+        GridItem(.flexible(), spacing: 18),
+        GridItem(.flexible(), spacing: 18)
     ]
 
     var body: some View {
-        SectionSurface {
-            VStack(alignment: .leading, spacing: AppSpacing.md) {
-                VStack(alignment: .leading, spacing: AppSpacing.xs) {
-                    Text(section.eyebrow.uppercased())
-                        .font(AppFont.eyebrow(11))
-                        .tracking(2)
-                        .foregroundStyle(AppColor.textSecondary)
-                    Text(section.title)
-                        .font(AppFont.heading(25))
-                        .foregroundStyle(AppColor.textPrimary)
-                }
+        VStack(alignment: .leading, spacing: 34) {
+            VStack(alignment: .leading, spacing: 14) {
+                Text(section.eyebrow.uppercased())
+                    .font(.system(size: 15, weight: .bold, design: .monospaced))
+                    .tracking(4.5)
+                    .foregroundStyle(AppColor.textSecondary.opacity(0.9))
 
-                if let featured = section.tiles.first {
-                    tile(featured, height: 170)
-                        .onTapGesture { onTap(featured) }
-                }
+                Text(section.title)
+                    .font(.system(size: 31, weight: .bold, design: .serif))
+                    .foregroundStyle(AppColor.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
-                LazyVGrid(columns: columns, spacing: AppSpacing.md) {
-                    ForEach(section.tiles.dropFirst()) { item in
-                        tile(item, height: 132)
-                            .onTapGesture { onTap(item) }
-                    }
+            if let featured = section.tiles.first {
+                tile(featured, height: 230, featured: true)
+                    .onTapGesture { onTap(featured) }
+            }
+
+            LazyVGrid(columns: columns, spacing: 18) {
+                ForEach(section.tiles.dropFirst()) { item in
+                    tile(item, height: 154, featured: false)
+                        .onTapGesture { onTap(item) }
                 }
             }
         }
+        .padding(.horizontal, 26)
+        .padding(.top, 4)
     }
 
-    private func tile(_ tile: HomeOSTile, height: CGFloat) -> some View {
+    private func tile(_ tile: HomeOSTile, height: CGFloat, featured: Bool) -> some View {
         ZStack(alignment: .bottomLeading) {
             GeometryReader { proxy in
                 RemoteImage(path: tile.imagePath)
@@ -54,36 +58,56 @@ struct OSTilesSection: View {
                     .clipped()
             }
             LinearGradient(
-                colors: [.clear, AppColor.primaryDark.opacity(0.95)],
+                colors: [
+                    .clear,
+                    AppColor.primaryDark.opacity(featured ? 0.28 : 0.18),
+                    AppColor.primaryDark.opacity(0.92)
+                ],
                 startPoint: .top,
                 endPoint: .bottom
             )
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(tile.title)
-                        .font(AppFont.heading(17))
-                        .foregroundStyle(AppColor.onDark)
-                    Text(tile.subtitle)
-                        .font(AppFont.caption(11))
-                        .foregroundStyle(AppColor.onDarkSecondary)
-                        .lineLimit(1)
+            .overlay {
+                if featured {
+                    LinearGradient(
+                        colors: [Color.black.opacity(0.10), .clear],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
                 }
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(AppColor.onDark)
-                    .padding(6)
-                    .background(Circle().fill(Color.white.opacity(0.2)))
             }
-            .padding(AppSpacing.md)
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(tile.title)
+                    .font(.system(size: featured ? 20 : 15, weight: .bold, design: .serif))
+                    .foregroundStyle(AppColor.onDark)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                Text(tile.subtitle)
+                    .font(.system(size: featured ? 18 : 13, weight: .medium))
+                    .foregroundStyle(AppColor.onDarkSecondary)
+                    .lineLimit(featured ? 3 : 3)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(18)
+            .padding(.trailing, 52)
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(AppColor.accentSoft)
+                .frame(width: 36, height: 36)
+                .background(Circle().fill(Color.black.opacity(0.28)))
+                .padding(.top, 18)
+                .padding(.trailing, 18)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         }
         .frame(height: height)
         .frame(maxWidth: .infinity)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: featured ? 36 : 30, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+            RoundedRectangle(cornerRadius: featured ? 36 : 30, style: .continuous)
+                .stroke(Color.white.opacity(0.10), lineWidth: 1)
         )
-        .shadow(color: AppColor.shadow.opacity(0.16), radius: 16, x: 0, y: 10)
+        .shadow(color: AppColor.shadow.opacity(featured ? 0.22 : 0.18), radius: featured ? 22 : 18, x: 0, y: 12)
     }
 }
