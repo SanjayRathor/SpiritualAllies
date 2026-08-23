@@ -35,18 +35,20 @@ struct SectionSurface<Content: View>: View {
 /// A rounded suggestion / tag chip.
 struct TagChip: View {
     let text: String
+
     var body: some View {
         Text(text)
             .font(.system(size: 16, weight: .semibold))
             .foregroundStyle(AppColor.primaryDark.opacity(0.92))
-            .padding(.horizontal, 24)
-            .padding(.vertical, 14)
-            .background(
-                Capsule().fill(Color.white)
-            )
-            .overlay(
-                Capsule().stroke(AppColor.cardStroke.opacity(0.8), lineWidth: 1)
-            )
+        .padding(.horizontal, 24)
+        .padding(.vertical, 14)
+        .background(
+            Capsule().fill(Color.white)
+        )
+        .overlay(
+            Capsule().stroke(AppColor.cardStroke.opacity(0.8), lineWidth: 1)
+        )
+        .shadow(color: AppColor.shadow.opacity(0.12), radius: 8, x: 0, y: 3)
     }
 }
 
