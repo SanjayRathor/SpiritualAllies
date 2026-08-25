@@ -19,7 +19,7 @@ struct MainTabView: View {
                 OfferingView()
             }
             Tab("tab.places", systemImage: "building.columns") {
-                PlacesView()
+                PlacesView(viewModel: dependencies.makePlacesViewModel())
             }
             Tab("tab.mentors", systemImage: "person.2") {
                 MentorsView()

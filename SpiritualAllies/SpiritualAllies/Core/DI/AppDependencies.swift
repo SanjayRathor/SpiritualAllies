@@ -47,4 +47,19 @@ final class AppDependencies {
         let useCase = DefaultFetchHomeDashboardUseCase(repository: makeHomeRepository())
         return HomeViewModel(fetchDashboard: useCase)
     }
+
+    // MARK: - Places
+
+    private func makePlacesRemoteDataSource() -> PlacesRemoteDataSource {
+        APIPlacesRemoteDataSource(client: apiClient)
+    }
+
+    private func makePlacesRepository() -> PlacesRepository {
+        PlacesRepositoryImpl(remoteDataSource: makePlacesRemoteDataSource())
+    }
+
+    func makePlacesViewModel() -> PlacesViewModel {
+        let useCase = DefaultFetchSacredPlacesUseCase(repository: makePlacesRepository())
+        return PlacesViewModel(fetchPlaces: useCase)
+    }
 }

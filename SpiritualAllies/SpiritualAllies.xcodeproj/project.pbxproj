@@ -401,7 +401,7 @@
 			repositoryURL = "https://github.com/relatedcode/ProgressHUD";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 15.0.2;
+				minimumVersion = 15.0.1;
 			};
 		};
 		83646D50303AE6CE008A65A1 /* XCRemoteSwiftPackageReference "Toast-Swift" */ = {

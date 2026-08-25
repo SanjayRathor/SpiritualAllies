@@ -48,7 +48,6 @@ final class SplashViewModel {
             return
         }
 
-        ToastHelper.showLoading()
         do {
             try await login.execute(username: credentials.username, password: credentials.password)
             _ = await delay
@@ -56,7 +55,6 @@ final class SplashViewModel {
             state = .ready
         } catch {
             _ = await delay
-            ToastHelper.hideLoading()
             let message = (error as? APIError)?.localizedDescription ?? error.localizedDescription
             state = .failed(message)
             ToastHelper.toast(message)

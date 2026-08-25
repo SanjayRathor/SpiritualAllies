@@ -42,13 +42,13 @@ final class HomeViewModel {
         }
 
         state = .loading
-        ToastHelper.showLoading(with: "Loading home")
+        ToastHelper.showLoading()
         do {
             let dashboard = try await fetchDashboard.execute()
             ToastHelper.hideLoading()
             state = .loaded(dashboard)
         } catch {
-            ToastHelper.hideLoading()
+           /// ToastHelper.hideLoading()
             let message = (error as? APIError)?.localizedDescription ?? error.localizedDescription
             state = .failed(message)
             ToastHelper.toast(message)
