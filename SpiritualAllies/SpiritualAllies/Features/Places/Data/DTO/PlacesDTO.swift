@@ -122,9 +122,18 @@ struct SacredPlaceDTO: Decodable {
         verified = container.decodeBool(for: [
             "verified",
             "isVerified"
+        ]) ?? container.decodeVerificationStatus(for: [
+            "verificationStatus",
+            "status"
         ]) ?? false
 
         imagePath = container.decodeImagePath(for: [
+            "imageUrl",
+            "imageURL",
+            "coverImageUrl",
+            "thumbnailUrl",
+            "photoUrl",
+            "heroImageUrl",
             "image",
             "coverImage",
             "thumbnail",
@@ -252,6 +261,29 @@ private extension KeyedDecodingContainer where Key == DynamicCodingKey {
                let resolved = nested.resolvedPath?.trimmingCharacters(in: .whitespacesAndNewlines),
                !resolved.isEmpty {
                 return resolved
+            }
+
+            if let nestedArray = try? decode([PlaceImageDTO].self, forKey: codingKey),
+               let resolved = nestedArray
+                .compactMap({ $0.resolvedPath?.trimmingCharacters(in: .whitespacesAndNewlines) })
+                .first(where: { !$0.isEmpty }) {
+                return resolved
+            }
+        }
+        return nil
+    }
+
+    func decodeVerificationStatus(for keys: [String]) -> Bool? {
+        for key in keys {
+            let codingKey = DynamicCodingKey(stringValue: key)!
+            if let value = try? decode(String.self, forKey: codingKey) {
+                let normalized = value.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                if ["VERIFIED", "APPROVED", "PUBLISHED", "ACTIVE"].contains(normalized) {
+                    return true
+                }
+                if ["PENDING", "UNVERIFIED", "REJECTED", "INACTIVE"].contains(normalized) {
+                    return false
+                }
             }
         }
         return nil

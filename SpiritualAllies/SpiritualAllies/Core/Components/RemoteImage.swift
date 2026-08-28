@@ -68,6 +68,10 @@ struct RemoteImage<Placeholder: View>: View {
             }
         }
         .onAppear { loader.load(path: path) }
+        .onChange(of: path) { _, newValue in
+            loader.image = nil
+            loader.load(path: newValue)
+        }
     }
 }
 

@@ -21,7 +21,6 @@ struct PlacesView: View {
             background
             content
         }
-        .animation(.easeInOut(duration: 0.35), value: viewModel.filteredPlaces.count)
         .task { await viewModel.onAppear() }
         .preferredColorScheme(.dark)
     }
@@ -31,39 +30,40 @@ struct PlacesView: View {
         switch viewModel.state {
         case .idle, .loading:
             Color.clear
-        case .failed(let message):
-            errorState(message)
-        case .loaded:
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 18) {
-                    PlacesHeroView(
-                        place: viewModel.heroPlace,
-                        countText: viewModel.heroCountText
-                    )
+            case .failed(let message):
+                errorState(message)
+            case .loaded:
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 18) {
+                        PlacesHeroView(
+                            place: viewModel.heroPlace,
+                            countText: viewModel.heroCountText
+                        )
+                        .padding(.horizontal, -16)
 
-                    categoryChips
+                        categoryChips
 
-                    if viewModel.filteredPlaces.isEmpty {
-                        emptyState
-                    } else {
-                        LazyVStack(alignment: .leading, spacing: 16) {
-                            ForEach(viewModel.filteredPlaces) { place in
-                                SacredPlaceRowCard(place: place)
-                                    .task {
-                                        await viewModel.loadMoreIfNeeded(current: place)
-                                    }
+                        if viewModel.filteredPlaces.isEmpty {
+                            emptyState
+                        } else {
+                            LazyVStack(alignment: .leading, spacing: 16) {
+                                ForEach(viewModel.filteredPlaces) { place in
+                                    SacredPlaceRowCard(place: place)
+                                        .task {
+                                            await viewModel.loadMoreIfNeeded(current: place)
+                                        }
+                                }
                             }
                         }
-                    }
 
-                    if viewModel.isLoadingMore {
-                        loadingMoreFooter
+                        if viewModel.isLoadingMore {
+                            loadingMoreFooter
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 110)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 110)
-            }
             .ignoresSafeArea(edges: .top)
         }
     }
@@ -75,15 +75,17 @@ struct PlacesView: View {
                     Button {
                         viewModel.selectedCategory = category
                     } label: {
-                        Text(category)
+                        Text(category.rawValue)
                             .font(.system(size: 15, weight: .semibold))
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                             .foregroundStyle(
                                 viewModel.selectedCategory == category
                                 ? AppColor.onDark
                                 : AppColor.primaryDark
                             )
                             .padding(.horizontal, 18)
-                            .padding(.vertical, 12)
+                            .padding(.vertical, 11)
                             .background(
                                 Capsule().fill(
                                     viewModel.selectedCategory == category
@@ -94,6 +96,14 @@ struct PlacesView: View {
                             .overlay(
                                 Capsule()
                                     .stroke(AppColor.cardStroke, lineWidth: 1)
+                            )
+                            .shadow(
+                                color: viewModel.selectedCategory == category
+                                ? AppColor.shadow.opacity(0.18)
+                                : AppColor.shadow.opacity(0.08),
+                                radius: 8,
+                                x: 0,
+                                y: 3
                             )
                     }
                     .buttonStyle(.plain)

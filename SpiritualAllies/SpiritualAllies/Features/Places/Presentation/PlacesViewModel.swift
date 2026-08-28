@@ -29,7 +29,7 @@ final class PlacesViewModel {
     private(set) var isLoadingMore = false
     private(set) var isLastPage = false
 
-    var selectedCategory: String = "All"
+    var selectedCategory: SacredPlaceCategory = .all
 
     private var currentPage: Int = -1
     private var isInitialLoadPerformed = false
@@ -40,27 +40,26 @@ final class PlacesViewModel {
         self.fetchPlaces = fetchPlaces
     }
 
-    var availableCategories: [String] {
-        var seen = Set<String>()
-        var values: [String] = ["All"]
-
-        for place in places {
-            let category = place.category.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !category.isEmpty, !seen.contains(category.lowercased()) else { continue }
-            seen.insert(category.lowercased())
-            values.append(category)
-        }
-
-        return values
+    var availableCategories: [SacredPlaceCategory] {
+        [
+            .all,
+            .temple,
+            .gurudwara,
+            .church,
+            .ashram,
+            .monastery,
+            .dargah,
+            .other
+        ]
     }
 
     var filteredPlaces: [SacredPlace] {
-        guard selectedCategory != "All" else { return places }
-        return places.filter { $0.category.caseInsensitiveCompare(selectedCategory) == .orderedSame }
+        guard selectedCategory != .all else { return places }
+        return places.filter { $0.matches(selectedCategory) }
     }
 
     var heroPlace: SacredPlace? {
-        filteredPlaces.first ?? places.first
+        places.first
     }
 
     var heroCountText: String {
@@ -88,6 +87,7 @@ final class PlacesViewModel {
     }
 
     func loadMoreIfNeeded(current place: SacredPlace) async {
+        guard selectedCategory == .all else { return }
         guard place.id == filteredPlaces.last?.id else { return }
         await loadNextPageIfNeeded()
     }
