@@ -49,10 +49,29 @@ struct HeroDTO: Decodable {
 struct CatalogDTO: Decodable {
     let features: [CatalogFeatureGroupDTO]?
     let analytics: CatalogAnalyticsDTO?
+    let path: CatalogPathDTO?
 }
 
 struct CatalogAnalyticsDTO: Decodable {
     let stats: [StatDTO]?
+}
+
+struct CatalogPathDTO: Decodable {
+    let id: String?
+    let eyebrow: String?
+    let title: String?
+    let subtitle: String?
+    let tiles: [CatalogPathTileDTO]?
+}
+
+struct CatalogPathTileDTO: Decodable {
+    let id: String
+    let label: String
+    let subtitle: String
+    let route: String
+    let imageUrl: String?
+    let icon: String?
+    let displayOrder: Int
 }
 
 struct CatalogFeatureGroupDTO: Decodable {

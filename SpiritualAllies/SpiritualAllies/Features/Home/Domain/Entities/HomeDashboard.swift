@@ -44,6 +44,7 @@ struct HomeStat: Equatable, Identifiable {
 struct HomeOSSection: Equatable {
     let eyebrow: String
     let title: String
+    let subtitle: String
     let tiles: [HomeOSTile]
 }
 
@@ -51,6 +52,7 @@ struct HomeOSTile: Equatable, Identifiable {
     let id: String
     let title: String
     let subtitle: String
+    let icon: String?
     let imagePath: String?
     let route: String
     let displayOrder: Int

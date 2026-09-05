@@ -31,6 +31,14 @@ struct OSTilesSection: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
                     .fixedSize(horizontal: false, vertical: true)
+
+                if !section.subtitle.isEmpty {
+                    Text(section.subtitle)
+                        .font(AppFont.body(15))
+                        .foregroundStyle(AppColor.textSecondary)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
 
             if let featured = section.tiles.first {
@@ -76,6 +84,23 @@ struct OSTilesSection: View {
                 }
             }
 
+            if let icon = tile.icon {
+                Image(systemName: systemImage(for: icon))
+                    .font(.system(size: featured ? 20 : 16, weight: .medium))
+                    .foregroundStyle(AppColor.onDark)
+                    .frame(width: featured ? 48 : 40, height: featured ? 48 : 40)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(AppColor.primary.opacity(0.72))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(Color.white.opacity(0.16), lineWidth: 1)
+                            )
+                    )
+                    .padding(18)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            }
+
             VStack(alignment: .leading, spacing: 5) {
                 Text(tile.title)
                     .font(.system(size: featured ? 20 : 14, weight: .bold, design: .serif))
@@ -109,5 +134,19 @@ struct OSTilesSection: View {
                 .stroke(Color.white.opacity(0.10), lineWidth: 1)
         )
         .shadow(color: AppColor.shadow.opacity(featured ? 0.22 : 0.18), radius: featured ? 22 : 18, x: 0, y: 12)
+    }
+
+    private func systemImage(for icon: String) -> String {
+        switch icon.lowercased() {
+        case "brain": return "brain.head.profile"
+        case "hand-heart": return "hands.sparkles"
+        case "users": return "person.2"
+        case "landmark": return "building.columns"
+        case "sparkles": return "sparkles"
+        case "compass": return "safari"
+        case "flower": return "camera.macro"
+        case "moon": return "moon.stars"
+        default: return "sparkles"
+        }
     }
 }

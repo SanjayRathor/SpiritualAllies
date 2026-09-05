@@ -20,7 +20,8 @@ enum HomeDTOMapper {
             stats: dashboard?.stats?.map(mapStat)
                 ?? dto.catalog?.analytics?.stats?.map(mapStat)
                 ?? [],
-            osSection: mapOSSection(dashboard?.osSection),
+            osSection: dashboard?.osSection.map(mapOSSection)
+                ?? mapPath(dto.catalog?.path),
             sacredPicks: mapSacredPicks(dashboard?.sacredPicks),
             discoveryCTA: mapDiscoveryCTA(dashboard?.discoveryCta)
         )
@@ -70,14 +71,36 @@ enum HomeDTOMapper {
         HomeStat(value: dto.value, label: dto.label, sub: dto.sub, icon: dto.icon)
     }
 
-    private static func mapOSSection(_ dto: OSSectionDTO?) -> HomeOSSection {
-        guard let dto else { return HomeOSSection(eyebrow: "", title: "", tiles: []) }
+    private static func mapOSSection(_ dto: OSSectionDTO) -> HomeOSSection {
         return HomeOSSection(
             eyebrow: dto.eyebrow,
             title: dto.title,
+            subtitle: "",
             tiles: dto.tiles
                 .sorted { $0.displayOrder < $1.displayOrder }
-                .map { HomeOSTile(id: $0.id, title: $0.title, subtitle: $0.subtitle, imagePath: $0.image?.imageUrl, route: $0.route, displayOrder: $0.displayOrder) }
+                .map { HomeOSTile(id: $0.id, title: $0.title, subtitle: $0.subtitle, icon: nil, imagePath: $0.image?.imageUrl, route: $0.route, displayOrder: $0.displayOrder) }
+        )
+    }
+
+    private static func mapPath(_ dto: CatalogPathDTO?) -> HomeOSSection {
+        guard let dto else { return HomeOSSection(eyebrow: "", title: "", subtitle: "", tiles: []) }
+        return HomeOSSection(
+            eyebrow: dto.eyebrow ?? "SpiritualAllies OS",
+            title: dto.title ?? "Everything Your Path Needs",
+            subtitle: dto.subtitle ?? "",
+            tiles: (dto.tiles ?? [])
+                .sorted { $0.displayOrder < $1.displayOrder }
+                .map {
+                    HomeOSTile(
+                        id: $0.id,
+                        title: $0.label,
+                        subtitle: $0.subtitle,
+                        icon: $0.icon,
+                        imagePath: $0.imageUrl,
+                        route: $0.route,
+                        displayOrder: $0.displayOrder
+                    )
+                }
         )
     }
 
