@@ -16,6 +16,7 @@ struct HomeDashboard: Equatable {
     let osSection: HomeOSSection
     let sacredPicks: HomeSacredPicks
     let sacredEvents: HomeSacredPicks
+    let sacredPlaces: HomeSacredPicks
     let discoveryCTA: HomeDiscoveryCTA
 }
 

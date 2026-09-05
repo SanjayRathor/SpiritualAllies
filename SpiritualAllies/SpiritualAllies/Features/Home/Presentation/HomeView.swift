@@ -61,6 +61,10 @@ struct HomeView: View {
                     SacredPicksSection(picks: dashboard.sacredEvents)
                 }
 
+                if !dashboard.sacredPlaces.items.isEmpty {
+                    SacredPicksSection(picks: dashboard.sacredPlaces)
+                }
+
                 if !dashboard.discoveryCTA.title.isEmpty {
                     DiscoveryCTASection(cta: dashboard.discoveryCTA)
                 }

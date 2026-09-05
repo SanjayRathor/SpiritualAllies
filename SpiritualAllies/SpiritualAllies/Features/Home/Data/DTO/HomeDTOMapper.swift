@@ -25,6 +25,7 @@ enum HomeDTOMapper {
             sacredPicks: dashboard?.sacredPicks.map(mapSacredPicks)
                 ?? mapOfferings(dto.catalog?.offerings),
             sacredEvents: mapSacredEvents(dto.catalog?.sacredEvents),
+            sacredPlaces: mapSacredPlaces(dto.catalog?.sacredPlaces),
             discoveryCTA: mapDiscoveryCTA(dashboard?.discoveryCta)
         )
     }
@@ -161,6 +162,38 @@ enum HomeDTOMapper {
                 )
             }
         )
+    }
+
+    private static func mapSacredPlaces(_ dto: CatalogSacredPlacesDTO?) -> HomeSacredPicks {
+        guard let dto else { return HomeSacredPicks(eyebrow: "", title: "", subtitle: "", seeAllLabel: "", items: []) }
+        return HomeSacredPicks(
+            eyebrow: dto.eyebrow ?? "Sacred geography",
+            title: dto.title ?? "Temples, Ghats & Pilgrimage Hubs",
+            subtitle: dto.subtitle ?? "",
+            seeAllLabel: dto.seeAllLabel ?? "Explore all",
+            items: (dto.items ?? []).compactMap { item in
+                guard let name = item.name, !name.isEmpty else { return nil }
+                let location = [item.city, item.stateRegion, item.country]
+                    .compactMap { $0 }
+                    .filter { !$0.isEmpty }
+                    .joined(separator: ", ")
+                return HomeCatalogItem(
+                    title: name,
+                    location: location,
+                    category: item.placeType ?? "Sacred Place",
+                    priceLabel: nil,
+                    rating: item.averageRating,
+                    verified: item.verificationStatus?.caseInsensitiveCompare("VERIFIED") == .orderedSame,
+                    imagePath: item.imageUrl ?? item.mentorPhotoUrl ?? firstGalleryPath(item.galleryUrls),
+                    route: item.id.map { "/sacred-places/\($0)" } ?? "/sacred-places"
+                )
+            }
+        )
+    }
+
+    private static func firstGalleryPath(_ value: String?) -> String? {
+        guard let value, let data = value.data(using: .utf8) else { return nil }
+        return (try? JSONDecoder().decode([String].self, from: data))?.first
     }
 
     private static func priceLabel(_ price: Double?, currencyCode: String?) -> String? {
