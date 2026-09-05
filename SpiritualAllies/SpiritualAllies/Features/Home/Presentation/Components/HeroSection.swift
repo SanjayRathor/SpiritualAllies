@@ -48,10 +48,11 @@ struct HeroSection: View {
             VStack(spacing: AppSpacing.sm) {
                 // The seek bar stays fixed while the feature content changes.
                 searchBar(placeholder: "What is your heart seeking?", actionLabel: "Seek")
+                fixedTags
                 pageIndicator
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 14)
+            .padding(.bottom, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
 
             if let firstSlide = slides.first {
@@ -104,7 +105,8 @@ struct HeroSection: View {
 
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 132)
+                    // Reserve space for the fixed seek bar, tags, and page controls.
+                    .padding(.bottom, 190)
                     .padding(.trailing, 12)
                 }
             }
@@ -180,6 +182,39 @@ struct HeroSection: View {
                 .fill(AppColor.surface)
                 .overlay(Capsule().stroke(AppColor.cardStroke, lineWidth: 1))
         )
+    }
+
+    private var fixedTags: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: AppSpacing.sm) {
+                ForEach([
+                    "Healing After Burnout",
+                    "Home Satyanarayan Puja",
+                    "Find A Vipassana Guide",
+                    "Kerala Ayurveda Retreat",
+                    "Ganga Aarti For Family"
+                ], id: \.self) { tag in
+                    Button {
+                        onPromptTap(tag)
+                    } label: {
+                        Text(tag)
+                            .font(AppFont.body(15))
+                            .foregroundStyle(AppColor.onDarkSecondary)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(Color.black.opacity(0.24))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                            .stroke(Color.white.opacity(0.22), lineWidth: 1)
+                                    )
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 
     private var pageIndicator: some View {
