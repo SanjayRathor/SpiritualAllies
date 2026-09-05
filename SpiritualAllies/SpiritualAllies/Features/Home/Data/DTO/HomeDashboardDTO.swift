@@ -50,6 +50,8 @@ struct CatalogDTO: Decodable {
     let features: [CatalogFeatureGroupDTO]?
     let analytics: CatalogAnalyticsDTO?
     let path: CatalogPathDTO?
+    let offerings: CatalogOfferingsDTO?
+    let sacredEvents: CatalogSacredEventsDTO?
 }
 
 struct CatalogAnalyticsDTO: Decodable {
@@ -72,6 +74,45 @@ struct CatalogPathTileDTO: Decodable {
     let imageUrl: String?
     let icon: String?
     let displayOrder: Int
+}
+
+struct CatalogOfferingsDTO: Decodable {
+    let eyebrow: String?
+    let title: String?
+    let subtitle: String?
+    let seeAllLabel: String?
+    let items: [CatalogOfferingItemDTO]?
+}
+
+struct CatalogOfferingItemDTO: Decodable {
+    let id: String?
+    let name: String?
+    let category: String?
+    let basePrice: Double?
+    let currencyCode: String?
+    let imageUrl: String?
+    let templeName: String?
+    let averageRating: Double?
+    let status: String?
+}
+
+struct CatalogSacredEventsDTO: Decodable {
+    let eyebrow: String?
+    let title: String?
+    let subtitle: String?
+    let seeAllLabel: String?
+    let items: [CatalogSacredEventItemDTO]?
+}
+
+struct CatalogSacredEventItemDTO: Decodable {
+    let id: String?
+    let title: String?
+    let destination: String?
+    let eventVenue: String?
+    let galleryUrls: String?
+    let pricePerPerson: Double?
+    let categories: String?
+    let status: String?
 }
 
 struct CatalogFeatureGroupDTO: Decodable {

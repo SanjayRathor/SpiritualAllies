@@ -15,6 +15,7 @@ struct HomeDashboard: Equatable {
     let stats: [HomeStat]
     let osSection: HomeOSSection
     let sacredPicks: HomeSacredPicks
+    let sacredEvents: HomeSacredPicks
     let discoveryCTA: HomeDiscoveryCTA
 }
 
@@ -59,7 +60,9 @@ struct HomeOSTile: Equatable, Identifiable {
 }
 
 struct HomeSacredPicks: Equatable {
+    let eyebrow: String
     let title: String
+    let subtitle: String
     let seeAllLabel: String
     let items: [HomeCatalogItem]
 }

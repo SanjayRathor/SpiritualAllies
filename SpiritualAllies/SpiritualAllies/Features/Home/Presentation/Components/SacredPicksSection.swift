@@ -14,7 +14,23 @@ struct SacredPicksSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            SectionHeader(title: picks.title, actionTitle: picks.seeAllLabel, action: onSeeAll)
+            VStack(alignment: .leading, spacing: 8) {
+                if !picks.eyebrow.isEmpty {
+                    Text(picks.eyebrow.uppercased())
+                        .font(AppFont.eyebrow(11))
+                        .tracking(3.0)
+                        .foregroundStyle(AppColor.accent.opacity(0.85))
+                }
+
+                SectionHeader(title: picks.title, actionTitle: picks.seeAllLabel, action: onSeeAll)
+
+                if !picks.subtitle.isEmpty {
+                    Text(picks.subtitle)
+                        .font(AppFont.body(15))
+                        .foregroundStyle(AppColor.textSecondary)
+                        .lineLimit(3)
+                }
+            }
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 18) {

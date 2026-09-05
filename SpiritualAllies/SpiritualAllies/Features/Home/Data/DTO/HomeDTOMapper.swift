@@ -22,7 +22,9 @@ enum HomeDTOMapper {
                 ?? [],
             osSection: dashboard?.osSection.map(mapOSSection)
                 ?? mapPath(dto.catalog?.path),
-            sacredPicks: mapSacredPicks(dashboard?.sacredPicks),
+            sacredPicks: dashboard?.sacredPicks.map(mapSacredPicks)
+                ?? mapOfferings(dto.catalog?.offerings),
+            sacredEvents: mapSacredEvents(dto.catalog?.sacredEvents),
             discoveryCTA: mapDiscoveryCTA(dashboard?.discoveryCta)
         )
     }
@@ -105,12 +107,70 @@ enum HomeDTOMapper {
     }
 
     private static func mapSacredPicks(_ dto: SacredPicksDTO?) -> HomeSacredPicks {
-        guard let dto else { return HomeSacredPicks(title: "", seeAllLabel: "", items: []) }
+        guard let dto else { return HomeSacredPicks(eyebrow: "", title: "", subtitle: "", seeAllLabel: "", items: []) }
         return HomeSacredPicks(
+            eyebrow: "",
             title: dto.title,
+            subtitle: "",
             seeAllLabel: dto.seeAllLabel,
             items: dto.items.map(mapCatalogItem)
         )
+    }
+
+    private static func mapOfferings(_ dto: CatalogOfferingsDTO?) -> HomeSacredPicks {
+        guard let dto else { return HomeSacredPicks(eyebrow: "", title: "", subtitle: "", seeAllLabel: "", items: []) }
+        return HomeSacredPicks(
+            eyebrow: dto.eyebrow ?? "Bookable now",
+            title: dto.title ?? "Sacred Offerings & Seva",
+            subtitle: dto.subtitle ?? "",
+            seeAllLabel: dto.seeAllLabel ?? "Browse offerings",
+            items: (dto.items ?? []).compactMap { item in
+                guard let name = item.name, !name.isEmpty else { return nil }
+                return HomeCatalogItem(
+                    title: name,
+                    location: item.templeName ?? "",
+                    category: item.category ?? "Offering",
+                    priceLabel: priceLabel(item.basePrice, currencyCode: item.currencyCode),
+                    rating: item.averageRating,
+                    verified: item.status?.caseInsensitiveCompare("PUBLISHED") == .orderedSame,
+                    imagePath: item.imageUrl,
+                    route: item.id.map { "/offerings/\($0)" } ?? "/offerings"
+                )
+            }
+        )
+    }
+
+    private static func mapSacredEvents(_ dto: CatalogSacredEventsDTO?) -> HomeSacredPicks {
+        guard let dto else { return HomeSacredPicks(eyebrow: "", title: "", subtitle: "", seeAllLabel: "", items: []) }
+        return HomeSacredPicks(
+            eyebrow: dto.eyebrow ?? "Living traditions",
+            title: dto.title ?? "Sacred Events",
+            subtitle: dto.subtitle ?? "",
+            seeAllLabel: dto.seeAllLabel ?? "Browse sacred events",
+            items: (dto.items ?? []).compactMap { item in
+                guard let title = item.title, !title.isEmpty else { return nil }
+                return HomeCatalogItem(
+                    title: title,
+                    location: item.eventVenue ?? item.destination ?? "",
+                    category: item.categories?.split(separator: ",").first.map(String.init) ?? "Event",
+                    priceLabel: priceLabel(item.pricePerPerson, currencyCode: "INR"),
+                    rating: nil,
+                    verified: item.status?.caseInsensitiveCompare("SCHEDULED") == .orderedSame,
+                    imagePath: item.galleryUrls?.split(separator: ",").first.map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) },
+                    route: item.id.map { "/sacred-events/\($0)" } ?? "/sacred-events"
+                )
+            }
+        )
+    }
+
+    private static func priceLabel(_ price: Double?, currencyCode: String?) -> String? {
+        guard let price else { return nil }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        let formatted = formatter.string(from: NSNumber(value: price)) ?? String(Int(price))
+        guard let currencyCode, currencyCode != "INR" else { return "₹\(formatted)" }
+        return "\(currencyCode) \(formatted)"
     }
 
     private static func mapCatalogItem(_ dto: CatalogItemDTO) -> HomeCatalogItem {
