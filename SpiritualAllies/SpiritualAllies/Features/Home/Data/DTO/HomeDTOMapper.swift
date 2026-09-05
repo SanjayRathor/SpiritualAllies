@@ -17,7 +17,9 @@ enum HomeDTOMapper {
 
         return HomeDashboard(
             heroes: heroes,
-            stats: dashboard?.stats?.map(mapStat) ?? [],
+            stats: dashboard?.stats?.map(mapStat)
+                ?? dto.catalog?.analytics?.stats?.map(mapStat)
+                ?? [],
             osSection: mapOSSection(dashboard?.osSection),
             sacredPicks: mapSacredPicks(dashboard?.sacredPicks),
             discoveryCTA: mapDiscoveryCTA(dashboard?.discoveryCta)

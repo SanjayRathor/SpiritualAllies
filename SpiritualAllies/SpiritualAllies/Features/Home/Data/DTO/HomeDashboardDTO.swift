@@ -48,6 +48,11 @@ struct HeroDTO: Decodable {
 
 struct CatalogDTO: Decodable {
     let features: [CatalogFeatureGroupDTO]?
+    let analytics: CatalogAnalyticsDTO?
+}
+
+struct CatalogAnalyticsDTO: Decodable {
+    let stats: [StatDTO]?
 }
 
 struct CatalogFeatureGroupDTO: Decodable {
