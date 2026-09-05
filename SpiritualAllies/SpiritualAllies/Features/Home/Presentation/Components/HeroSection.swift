@@ -41,7 +41,6 @@ struct HeroSection: View {
                 ForEach(slides.indices, id: \.self) { index in
                     heroCard(for: slides[index])
                         .tag(index)
-                        .padding(.bottom, 14)
                 }
             }
 
@@ -94,12 +93,14 @@ struct HeroSection: View {
                         Text(slide.title)
                             .font(AppFont.title(28))
                             .foregroundStyle(AppColor.onDark)
+                            .shadow(color: .black.opacity(0.75), radius: 5, x: 0, y: 2)
                             .lineLimit(3)
                             .fixedSize(horizontal: false, vertical: true)
 
                         Text(slide.subtitle)
                             .font(AppFont.body(15))
                             .foregroundStyle(AppColor.onDarkSecondary)
+                            .shadow(color: .black.opacity(0.8), radius: 4, x: 0, y: 2)
                             .lineLimit(3)
                             .fixedSize(horizontal: false, vertical: true)
 
@@ -128,10 +129,12 @@ struct HeroSection: View {
                 Text(slide.brandName.isEmpty ? "SpiritualAllies" : slide.brandName)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(AppColor.onDark)
+                    .shadow(color: .black.opacity(0.65), radius: 3, x: 0, y: 1)
                 Text(slide.tagline.isEmpty ? "TRANSFORM · HEAL · AWAKEN" : slide.tagline.uppercased())
                     .font(AppFont.eyebrow(10))
                     .tracking(2.0)
                     .foregroundStyle(AppColor.onDarkSecondary)
+                    .shadow(color: .black.opacity(0.65), radius: 3, x: 0, y: 1)
             }
 
             Spacer(minLength: 8)
@@ -198,10 +201,10 @@ struct HeroSection: View {
                         onPromptTap(tag)
                     } label: {
                         Text(tag)
-                            .font(AppFont.body(15))
+                            .font(AppFont.body(13))
                             .foregroundStyle(AppColor.onDarkSecondary)
                             .padding(.horizontal, 14)
-                            .padding(.vertical, 10)
+                            .padding(.vertical, 6)
                             .background(
                                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                                     .fill(Color.black.opacity(0.24))
