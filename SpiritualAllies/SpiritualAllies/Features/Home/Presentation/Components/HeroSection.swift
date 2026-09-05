@@ -36,7 +36,7 @@ struct HeroSection: View {
     }
 
     private var heroCarousel: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             TabView(selection: $selectedIndex) {
                 ForEach(slides.indices, id: \.self) { index in
                     heroCard(for: slides[index])
@@ -52,6 +52,13 @@ struct HeroSection: View {
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 14)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+
+            if let firstSlide = slides.first {
+                header(for: firstSlide)
+                    .padding(.horizontal, 20)
+                    .padding(.top, topSafeAreaInset + 10)
+            }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
         .animation(.easeInOut(duration: 0.35), value: selectedIndex)
@@ -80,10 +87,6 @@ struct HeroSection: View {
                 .shadow(color: AppColor.shadow.opacity(0.18), radius: 24, x: 0, y: 14)
 
                 VStack(alignment: .leading, spacing: 0) {
-                    header(for: slide)
-                        .padding(.horizontal, 20)
-                        .padding(.top, topSafeAreaInset + 10)
-
                     Spacer(minLength: 0)
 
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
@@ -99,7 +102,6 @@ struct HeroSection: View {
                             .lineLimit(3)
                             .fixedSize(horizontal: false, vertical: true)
 
-                        featureTags(for: slide)
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 132)
@@ -178,30 +180,6 @@ struct HeroSection: View {
                 .fill(AppColor.surface)
                 .overlay(Capsule().stroke(AppColor.cardStroke, lineWidth: 1))
         )
-    }
-
-    private func featureTags(for slide: HomeHero) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: AppSpacing.sm) {
-                ForEach(slide.prompts, id: \.self) { prompt in
-                    Button {
-                        onPromptTap(prompt)
-                    } label: {
-                        Text(prompt)
-                            .font(AppFont.body(15))
-                            .foregroundStyle(AppColor.textPrimary)
-                            .padding(.horizontal, 22)
-                            .padding(.vertical, 14)
-                            .background(
-                                Capsule()
-                                    .fill(AppColor.surface)
-                                    .overlay(Capsule().stroke(AppColor.cardStroke, lineWidth: 1))
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
     }
 
     private var pageIndicator: some View {
