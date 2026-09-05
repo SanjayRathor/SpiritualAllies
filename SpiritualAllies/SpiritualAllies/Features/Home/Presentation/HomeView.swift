@@ -43,15 +43,23 @@ struct HomeView: View {
     private func dashboardScroll(_ dashboard: HomeDashboard) -> some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 20) {
-                HeroSection(hero: dashboard.hero, searchText: $viewModel.searchText)
+                HeroSection(slides: dashboard.heroes, searchText: $viewModel.searchText)
 
-                StatsSection(stats: dashboard.stats)
+                if !dashboard.stats.isEmpty {
+                    StatsSection(stats: dashboard.stats)
+                }
 
-                OSTilesSection(section: dashboard.osSection)
+                if !dashboard.osSection.tiles.isEmpty {
+                    OSTilesSection(section: dashboard.osSection)
+                }
 
-                SacredPicksSection(picks: dashboard.sacredPicks)
+                if !dashboard.sacredPicks.items.isEmpty {
+                    SacredPicksSection(picks: dashboard.sacredPicks)
+                }
 
-                DiscoveryCTASection(cta: dashboard.discoveryCTA)
+                if !dashboard.discoveryCTA.title.isEmpty {
+                    DiscoveryCTASection(cta: dashboard.discoveryCTA)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, 120)

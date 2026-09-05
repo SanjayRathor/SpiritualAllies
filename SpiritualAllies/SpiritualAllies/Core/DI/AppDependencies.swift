@@ -3,28 +3,22 @@
 //  SpiritualAllies
 //
 //  Composition root. Single place where concrete implementations are wired to
-//  their protocols. A shared token store + auth interceptor make every request
-//  from `apiClient` automatically carry the Bearer token after login.
+//  their protocols.
 //
 
 import Foundation
 
 @MainActor
 final class AppDependencies {
-    /// Shared, in-memory token store consulted by the auth interceptor.
-    private let tokenStore: TokenProviding = InMemoryTokenStore()
-
-    /// One authenticated API client shared across features.
-    private lazy var apiClient: APIClient = AlamofireAPIClient(
-        interceptor: AuthInterceptor(tokenProvider: tokenStore)
-    )
+    /// Public API client shared across features.
+    private lazy var apiClient: APIClient = AlamofireAPIClient()
 
     // MARK: - Auth
 
     private func makeAuthRepository() -> AuthRepository {
         AuthRepositoryImpl(
             remoteDataSource: APIAuthRemoteDataSource(client: apiClient),
-            tokenStore: tokenStore
+            tokenStore: InMemoryTokenStore()
         )
     }
 

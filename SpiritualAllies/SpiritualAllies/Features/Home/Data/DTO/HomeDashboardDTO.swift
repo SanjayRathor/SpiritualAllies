@@ -12,17 +12,18 @@ import Foundation
 
 // MARK: - Root
 
-/// Top-level response of GET /admin/mobile/dashboard: `{ "dashboard": {...} }`.
+/// Top-level response of GET /api/mobile/screen?section=landing.
 struct HomeResponseDTO: Decodable {
-    let dashboard: DashboardDTO
+    let catalog: CatalogDTO?
+    let dashboard: DashboardDTO?
 }
 
 struct DashboardDTO: Decodable {
-    let hero: HeroDTO
-    let stats: [StatDTO]
-    let osSection: OSSectionDTO
-    let sacredPicks: SacredPicksDTO
-    let discoveryCta: DiscoveryCtaDTO
+    let hero: HeroDTO?
+    let stats: [StatDTO]?
+    let osSection: OSSectionDTO?
+    let sacredPicks: SacredPicksDTO?
+    let discoveryCta: DiscoveryCtaDTO?
 }
 
 // MARK: - Shared
@@ -43,6 +44,28 @@ struct HeroDTO: Decodable {
     let subtitle: String
     let heroImage: ImageDTO?
     let seek: SeekDTO
+}
+
+struct CatalogDTO: Decodable {
+    let features: [CatalogFeatureGroupDTO]?
+}
+
+struct CatalogFeatureGroupDTO: Decodable {
+    let name: String
+    let contents: [CatalogFeatureContentDTO]
+    let displayOrder: Int?
+}
+
+struct CatalogFeatureContentDTO: Decodable {
+    let title: String?
+    let desc: String?
+    let galleries: [CatalogGalleryDTO]?
+    let tags: [String]?
+    let displayOrder: Int?
+}
+
+struct CatalogGalleryDTO: Decodable {
+    let imageUrl: String?
 }
 
 struct SeekDTO: Decodable {

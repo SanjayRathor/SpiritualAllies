@@ -11,12 +11,41 @@ import Foundation
 enum HomeDTOMapper {
     static func map(_ dto: HomeResponseDTO) -> HomeDashboard {
         let dashboard = dto.dashboard
+        let heroes = mapFeatures(dto.catalog?.features)
+            ?? dashboard?.hero.map { [mapHero($0)] }
+            ?? []
+
         return HomeDashboard(
-            hero: mapHero(dashboard.hero),
-            stats: dashboard.stats.map(mapStat),
-            osSection: mapOSSection(dashboard.osSection),
-            sacredPicks: mapSacredPicks(dashboard.sacredPicks),
-            discoveryCTA: mapDiscoveryCTA(dashboard.discoveryCta)
+            heroes: heroes,
+            stats: dashboard?.stats?.map(mapStat) ?? [],
+            osSection: mapOSSection(dashboard?.osSection),
+            sacredPicks: mapSacredPicks(dashboard?.sacredPicks),
+            discoveryCTA: mapDiscoveryCTA(dashboard?.discoveryCta)
+        )
+    }
+
+    private static func mapFeatures(_ groups: [CatalogFeatureGroupDTO]?) -> [HomeHero]? {
+        guard let groups, !groups.isEmpty else { return nil }
+        let seekGroup = groups.first { $0.name.caseInsensitiveCompare("Seek") == .orderedSame }
+        let group = seekGroup ?? groups.sorted { ($0.displayOrder ?? 0) < ($1.displayOrder ?? 0) }.first
+        return group?.contents
+            .sorted { ($0.displayOrder ?? 0) < ($1.displayOrder ?? 0) }
+            .compactMap { mapFeature($0, groupName: group?.name ?? "Sacred Discovery") }
+    }
+
+    private static func mapFeature(_ dto: CatalogFeatureContentDTO, groupName: String) -> HomeHero? {
+        guard let title = dto.title, !title.isEmpty else { return nil }
+        return HomeHero(
+            brandMark: "श्री",
+            brandName: "SpiritualAllies",
+            tagline: "Transform · Heal · Awaken",
+            eyebrow: groupName,
+            title: title,
+            subtitle: dto.desc ?? "Explore a path that meets you where you are.",
+            heroImagePath: dto.galleries?.first?.imageUrl,
+            searchPlaceholder: "What is your heart seeking?",
+            searchActionLabel: "Seek",
+            prompts: dto.tags ?? []
         )
     }
 
@@ -39,8 +68,9 @@ enum HomeDTOMapper {
         HomeStat(value: dto.value, label: dto.label, sub: dto.sub, icon: dto.icon)
     }
 
-    private static func mapOSSection(_ dto: OSSectionDTO) -> HomeOSSection {
-        HomeOSSection(
+    private static func mapOSSection(_ dto: OSSectionDTO?) -> HomeOSSection {
+        guard let dto else { return HomeOSSection(eyebrow: "", title: "", tiles: []) }
+        return HomeOSSection(
             eyebrow: dto.eyebrow,
             title: dto.title,
             tiles: dto.tiles
@@ -49,8 +79,9 @@ enum HomeDTOMapper {
         )
     }
 
-    private static func mapSacredPicks(_ dto: SacredPicksDTO) -> HomeSacredPicks {
-        HomeSacredPicks(
+    private static func mapSacredPicks(_ dto: SacredPicksDTO?) -> HomeSacredPicks {
+        guard let dto else { return HomeSacredPicks(title: "", seeAllLabel: "", items: []) }
+        return HomeSacredPicks(
             title: dto.title,
             seeAllLabel: dto.seeAllLabel,
             items: dto.items.map(mapCatalogItem)
@@ -70,8 +101,9 @@ enum HomeDTOMapper {
         )
     }
 
-    private static func mapDiscoveryCTA(_ dto: DiscoveryCtaDTO) -> HomeDiscoveryCTA {
-        HomeDiscoveryCTA(
+    private static func mapDiscoveryCTA(_ dto: DiscoveryCtaDTO?) -> HomeDiscoveryCTA {
+        guard let dto else { return HomeDiscoveryCTA(eyebrow: "", title: "", subtitle: "", ctaLabel: "", backgroundImagePath: nil) }
+        return HomeDiscoveryCTA(
             eyebrow: dto.eyebrow,
             title: dto.title,
             subtitle: dto.subtitle,

@@ -2,18 +2,19 @@
 //  HeroSection.swift
 //  SpiritualAllies
 //
-//  Rebuilt hero with explicit outer padding and inset image/card layout.
-//  The goal is to keep the right edge visibly inset and avoid clipping.
+//  Swipeable, auto-advancing hero carousel for the Home screen.
 //
 
 import SwiftUI
 import UIKit
 
 struct HeroSection: View {
-    let hero: HomeHero
+    let slides: [HomeHero]
     @Binding var searchText: String
     var onSeek: () -> Void = {}
     var onPromptTap: (String) -> Void = { _ in }
+
+    @State private var selectedIndex = 0
 
     private var topSafeAreaInset: CGFloat {
         UIApplication.shared.connectedScenes
@@ -25,18 +26,94 @@ struct HeroSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
-            heroCard
-            promptChips
-                .padding(.horizontal, 8)
+            heroCarousel
+                .frame(height: 540)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .task {
+            await autoAdvanceLoop()
+        }
     }
 
-    /// Overlaid directly on the hero image now, so it always renders on
-    /// dark imagery — colors are tuned for that, not the cream background.
-    private var header: some View {
+    private var heroCarousel: some View {
+        ZStack(alignment: .bottom) {
+            TabView(selection: $selectedIndex) {
+                ForEach(slides.indices, id: \.self) { index in
+                    heroCard(for: slides[index])
+                        .tag(index)
+                        .padding(.bottom, 14)
+                }
+            }
+
+            VStack(spacing: AppSpacing.sm) {
+                // The seek bar stays fixed while the feature content changes.
+                searchBar(placeholder: "What is your heart seeking?", actionLabel: "Seek")
+                pageIndicator
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 14)
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .animation(.easeInOut(duration: 0.35), value: selectedIndex)
+    }
+
+    private func heroCard(for slide: HomeHero) -> some View {
+        GeometryReader { proxy in
+            ZStack(alignment: .top) {
+                ZStack {
+                    RemoteImage(path: slide.heroImagePath)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .clipped()
+
+                    LinearGradient(
+                        colors: [
+                            Color.black.opacity(0.08),
+                            AppColor.primaryDark.opacity(0.05),
+                            AppColor.primaryDark.opacity(0.34),
+                            AppColor.primaryDark.opacity(0.86)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                }
+                .shadow(color: AppColor.shadow.opacity(0.18), radius: 24, x: 0, y: 14)
+
+                VStack(alignment: .leading, spacing: 0) {
+                    header(for: slide)
+                        .padding(.horizontal, 20)
+                        .padding(.top, topSafeAreaInset + 10)
+
+                    Spacer(minLength: 0)
+
+                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
+                        Text(slide.title)
+                            .font(AppFont.title(28))
+                            .foregroundStyle(AppColor.onDark)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text(slide.subtitle)
+                            .font(AppFont.body(15))
+                            .foregroundStyle(AppColor.onDarkSecondary)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        featureTags(for: slide)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 132)
+                    .padding(.trailing, 12)
+                }
+            }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+    }
+
+    /// Keeps the top row readable over every slide image.
+    private func header(for slide: HomeHero) -> some View {
         HStack(spacing: AppSpacing.sm) {
-            Text(hero.brandMark)
+            Text(slide.brandMark.isEmpty ? "श्री" : slide.brandMark)
                 .font(.system(size: 15, weight: .bold, design: .serif))
                 .foregroundStyle(AppColor.accent)
                 .frame(width: 38, height: 38)
@@ -44,10 +121,10 @@ struct HeroSection: View {
                 .overlay(Circle().stroke(AppColor.accent.opacity(0.5), lineWidth: 1))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(hero.brandName.isEmpty ? "SpiritualAllies" : hero.brandName)
+                Text(slide.brandName.isEmpty ? "SpiritualAllies" : slide.brandName)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(AppColor.onDark)
-                Text(hero.tagline.uppercased())
+                Text(slide.tagline.isEmpty ? "TRANSFORM · HEAL · AWAKEN" : slide.tagline.uppercased())
                     .font(AppFont.eyebrow(10))
                     .tracking(2.0)
                     .foregroundStyle(AppColor.onDarkSecondary)
@@ -67,78 +144,14 @@ struct HeroSection: View {
         }
     }
 
-    private var heroCard: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .top) {
-                ZStack {
-                    RemoteImage(path: hero.heroImagePath)
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: proxy.size.width, height: proxy.size.height)
-                        .clipped()
-
-                    LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.12),
-                            AppColor.primaryDark.opacity(0.05),
-                            AppColor.primaryDark.opacity(0.42),
-                            AppColor.primaryDark.opacity(0.90)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                }
-                .ignoresSafeArea(edges: .top)
-
-                VStack(alignment: .leading, spacing: 0) {
-                    header
-                        .padding(.horizontal, 20)
-                        .padding(.top, 12)
-
-                    Spacer(minLength: 0)
-
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        Text(hero.eyebrow.uppercased())
-                            .font(AppFont.eyebrow(11))
-                            .tracking(2.4)
-                            .foregroundStyle(AppColor.accentSoft)
-                            .padding(.horizontal, AppSpacing.md)
-                            .padding(.vertical, 6)
-                            .background(Capsule().fill(Color.white.opacity(0.12)))
-
-                        Text(hero.title)
-                            .font(AppFont.title(24))
-                            .foregroundStyle(AppColor.onDark)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(hero.subtitle)
-                            .font(AppFont.body(14))
-                            .foregroundStyle(AppColor.onDarkSecondary)
-                            .lineLimit(3)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        searchBar
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
-                    .padding(.trailing, 12)
-                }
-                .padding(.top, topSafeAreaInset)
-            }
-            .frame(width: proxy.size.width, height: proxy.size.height)
-        }
-        .frame(height: 480)
-        .ignoresSafeArea(edges: .top)
-    }
-
-    private var searchBar: some View {
+    private func searchBar(placeholder: String, actionLabel: String) -> some View {
         HStack(spacing: AppSpacing.sm) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 17, weight: .medium))
                 .foregroundStyle(AppColor.textSecondary)
 
             TextField("", text: $searchText, prompt:
-                Text(hero.searchPlaceholder).foregroundStyle(AppColor.textSecondary)
+                Text(placeholder).foregroundStyle(AppColor.textSecondary)
             )
             .font(AppFont.body(16))
             .foregroundStyle(AppColor.textPrimary)
@@ -147,7 +160,7 @@ struct HeroSection: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Button(action: onSeek) {
-                Text(hero.searchActionLabel)
+                Text(actionLabel)
                     .font(AppFont.heading(14))
                     .foregroundStyle(AppColor.primaryDark)
                     .padding(.horizontal, AppSpacing.md)
@@ -167,18 +180,56 @@ struct HeroSection: View {
         )
     }
 
-    private var promptChips: some View {
+    private func featureTags(for slide: HomeHero) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppSpacing.sm) {
-                ForEach(hero.prompts, id: \.self) { prompt in
-                    Button { onPromptTap(prompt) } label: {
-                        TagChip(text: prompt)
+                ForEach(slide.prompts, id: \.self) { prompt in
+                    Button {
+                        onPromptTap(prompt)
+                    } label: {
+                        Text(prompt)
+                            .font(AppFont.body(15))
+                            .foregroundStyle(AppColor.textPrimary)
+                            .padding(.horizontal, 22)
+                            .padding(.vertical, 14)
+                            .background(
+                                Capsule()
+                                    .fill(AppColor.surface)
+                                    .overlay(Capsule().stroke(AppColor.cardStroke, lineWidth: 1))
+                            )
                     }
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, AppSpacing.xs)
+        }
+    }
+
+    private var pageIndicator: some View {
+        HStack(spacing: 6) {
+            ForEach(slides.indices, id: \.self) { index in
+                Capsule(style: .continuous)
+                    .fill(index == selectedIndex ? AppColor.accent : Color.white.opacity(0.4))
+                    .frame(width: index == selectedIndex ? 20 : 7, height: 7)
+                    .animation(.easeInOut(duration: 0.25), value: selectedIndex)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            Capsule()
+                .fill(Color.black.opacity(0.22))
+                .overlay(Capsule().stroke(Color.white.opacity(0.08), lineWidth: 1))
+        )
+    }
+
+    private func autoAdvanceLoop() async {
+        guard slides.count > 1 else { return }
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(4))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.35)) {
+                selectedIndex = (selectedIndex + 1) % slides.count
+            }
         }
     }
 }

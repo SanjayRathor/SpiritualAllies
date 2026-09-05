@@ -11,7 +11,7 @@ import Foundation
 
 /// The full Home dashboard model (subset matching the current design).
 struct HomeDashboard: Equatable {
-    let hero: HomeHero
+    let heroes: [HomeHero]
     let stats: [HomeStat]
     let osSection: HomeOSSection
     let sacredPicks: HomeSacredPicks
@@ -33,11 +33,12 @@ struct HomeHero: Equatable {
 }
 
 struct HomeStat: Equatable, Identifiable {
-    let id = UUID()
     let value: String
     let label: String
     let sub: String
     let icon: String
+
+    var id: String { "\(value)-\(label)" }
 }
 
 struct HomeOSSection: Equatable {
@@ -63,7 +64,6 @@ struct HomeSacredPicks: Equatable {
 
 /// A generic bookable catalog card (offering / retreat / event / place).
 struct HomeCatalogItem: Equatable, Identifiable {
-    let id = UUID()
     let title: String
     let location: String
     let category: String
@@ -72,6 +72,8 @@ struct HomeCatalogItem: Equatable, Identifiable {
     let verified: Bool
     let imagePath: String?
     let route: String
+
+    var id: String { route.isEmpty ? title : route }
 }
 
 struct HomeDiscoveryCTA: Equatable {
