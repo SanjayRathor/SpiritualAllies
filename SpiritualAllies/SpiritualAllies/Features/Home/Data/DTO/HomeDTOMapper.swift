@@ -26,6 +26,9 @@ enum HomeDTOMapper {
                 ?? mapOfferings(dto.catalog?.offerings),
             sacredEvents: mapSacredEvents(dto.catalog?.sacredEvents),
             sacredPlaces: mapSacredPlaces(dto.catalog?.sacredPlaces),
+            pilgrimages: mapSimpleSection(dto.catalog?.pilgrimages, defaultEyebrow: "Sacred circuits", defaultTitle: "Pilgrimages", defaultAction: "Browse pilgrimages"),
+            mentors: mapMentors(dto.catalog?.mentors),
+            panchang: mapPanchang(dto.catalog?.panchang),
             discoveryCTA: mapDiscoveryCTA(dashboard?.discoveryCta)
         )
     }
@@ -187,6 +190,49 @@ enum HomeDTOMapper {
                     imagePath: item.imageUrl ?? item.mentorPhotoUrl ?? firstGalleryPath(item.galleryUrls),
                     route: item.id.map { "/sacred-places/\($0)" } ?? "/sacred-places"
                 )
+            }
+        )
+    }
+
+    private static func mapSimpleSection(_ dto: CatalogSimpleSectionDTO?, defaultEyebrow: String, defaultTitle: String, defaultAction: String) -> HomeSacredPicks {
+        guard let dto else { return HomeSacredPicks(eyebrow: "", title: "", subtitle: "", seeAllLabel: "", items: []) }
+        return HomeSacredPicks(
+            eyebrow: dto.eyebrow ?? defaultEyebrow,
+            title: dto.title ?? defaultTitle,
+            subtitle: dto.subtitle ?? "",
+            seeAllLabel: dto.seeAllLabel ?? defaultAction,
+            items: (dto.items ?? []).compactMap { item in
+                guard let title = item.title else { return nil }
+                return HomeCatalogItem(title: title, location: "", category: item.category ?? "Pilgrimage", priceLabel: nil, rating: nil, verified: false, imagePath: item.imageUrl, route: item.route ?? "/pilgrimages")
+            }
+        )
+    }
+
+    private static func mapMentors(_ dto: CatalogMentorsDTO?) -> HomeSacredPicks {
+        guard let dto else { return HomeSacredPicks(eyebrow: "", title: "", subtitle: "", seeAllLabel: "", items: []) }
+        return HomeSacredPicks(
+            eyebrow: dto.eyebrow ?? "Verified guides",
+            title: dto.title ?? "Meet Mentors & Purohits",
+            subtitle: dto.subtitle ?? "",
+            seeAllLabel: dto.seeAllLabel ?? "View all mentors",
+            items: (dto.items ?? []).compactMap { item in
+                guard let title = item.spiritualName ?? item.fullName else { return nil }
+                return HomeCatalogItem(title: title, location: item.address ?? "", category: item.spiritualLineage ?? "Mentor", priceLabel: priceLabel(item.sessionFee, currencyCode: item.sessionCurrencyCode), rating: item.averageRating, verified: item.verificationStatus?.caseInsensitiveCompare("VERIFIED") == .orderedSame, imagePath: item.profilePhotoUrl, route: item.id.map { "/mentors/\($0)" } ?? "/mentors")
+            }
+        )
+    }
+
+    private static func mapPanchang(_ dto: CatalogPanchangDTO?) -> HomePanchang? {
+        guard let dto, let today = dto.today else { return nil }
+        return HomePanchang(
+            eyebrow: dto.eyebrow ?? "Divine timing",
+            title: dto.title ?? "Panchang",
+            subtitle: dto.subtitle ?? "",
+            date: today.gregorianDate ?? today.weekday ?? "",
+            hinduDate: today.hinduDate ?? "",
+            pillars: (today.pillars ?? []).compactMap { pillar in
+                guard let id = pillar.id, let name = pillar.name else { return nil }
+                return HomePanchangPillar(id: id, label: pillar.label ?? id.capitalized, name: name, detail: pillar.detail ?? "")
             }
         )
     }

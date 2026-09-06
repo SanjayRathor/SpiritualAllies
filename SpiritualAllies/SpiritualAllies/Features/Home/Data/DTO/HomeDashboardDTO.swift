@@ -53,6 +53,9 @@ struct CatalogDTO: Decodable {
     let offerings: CatalogOfferingsDTO?
     let sacredEvents: CatalogSacredEventsDTO?
     let sacredPlaces: CatalogSacredPlacesDTO?
+    let pilgrimages: CatalogSimpleSectionDTO?
+    let mentors: CatalogMentorsDTO?
+    let panchang: CatalogPanchangDTO?
 }
 
 struct CatalogAnalyticsDTO: Decodable {
@@ -136,6 +139,65 @@ struct CatalogSacredPlaceItemDTO: Decodable {
     let galleryUrls: String?
     let verificationStatus: String?
     let averageRating: Double?
+}
+
+struct CatalogSimpleSectionDTO: Decodable {
+    let eyebrow: String?
+    let title: String?
+    let subtitle: String?
+    let seeAllLabel: String?
+    let items: [CatalogSimpleItemDTO]?
+}
+
+struct CatalogSimpleItemDTO: Decodable {
+    let id: String?
+    let title: String?
+    let subtitle: String?
+    let imageUrl: String?
+    let route: String?
+    let category: String?
+}
+
+struct CatalogMentorsDTO: Decodable {
+    let eyebrow: String?
+    let title: String?
+    let subtitle: String?
+    let seeAllLabel: String?
+    let items: [CatalogMentorItemDTO]?
+}
+
+struct CatalogMentorItemDTO: Decodable {
+    let id: String?
+    let fullName: String?
+    let spiritualName: String?
+    let spiritualLineage: String?
+    let address: String?
+    let profilePhotoUrl: String?
+    let verificationStatus: String?
+    let averageRating: Double?
+    let sessionFee: Double?
+    let sessionCurrencyCode: String?
+}
+
+struct CatalogPanchangDTO: Decodable {
+    let eyebrow: String?
+    let title: String?
+    let subtitle: String?
+    let today: CatalogPanchangTodayDTO?
+}
+
+struct CatalogPanchangTodayDTO: Decodable {
+    let gregorianDate: String?
+    let hinduDate: String?
+    let weekday: String?
+    let pillars: [CatalogPanchangPillarDTO]?
+}
+
+struct CatalogPanchangPillarDTO: Decodable {
+    let id: String?
+    let label: String?
+    let name: String?
+    let detail: String?
 }
 
 struct CatalogFeatureGroupDTO: Decodable {

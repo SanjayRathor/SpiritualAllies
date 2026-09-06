@@ -17,7 +17,26 @@ struct HomeDashboard: Equatable {
     let sacredPicks: HomeSacredPicks
     let sacredEvents: HomeSacredPicks
     let sacredPlaces: HomeSacredPicks
+    let pilgrimages: HomeSacredPicks
+    let mentors: HomeSacredPicks
+    let panchang: HomePanchang?
     let discoveryCTA: HomeDiscoveryCTA
+}
+
+struct HomePanchang: Equatable {
+    let eyebrow: String
+    let title: String
+    let subtitle: String
+    let date: String
+    let hinduDate: String
+    let pillars: [HomePanchangPillar]
+}
+
+struct HomePanchangPillar: Equatable, Identifiable {
+    let id: String
+    let label: String
+    let name: String
+    let detail: String
 }
 
 struct HomeHero: Equatable {

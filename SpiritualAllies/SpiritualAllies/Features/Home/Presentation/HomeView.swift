@@ -65,6 +65,18 @@ struct HomeView: View {
                     SacredPicksSection(picks: dashboard.sacredPlaces)
                 }
 
+                if !dashboard.pilgrimages.items.isEmpty {
+                    SacredPicksSection(picks: dashboard.pilgrimages)
+                }
+
+                if !dashboard.mentors.items.isEmpty {
+                    SacredPicksSection(picks: dashboard.mentors)
+                }
+
+                if let panchang = dashboard.panchang {
+                    PanchangSection(panchang: panchang)
+                }
+
                 if !dashboard.discoveryCTA.title.isEmpty {
                     DiscoveryCTASection(cta: dashboard.discoveryCTA)
                 }
