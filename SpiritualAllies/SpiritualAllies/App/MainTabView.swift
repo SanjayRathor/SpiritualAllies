@@ -9,11 +9,19 @@ import SwiftUI
 
 struct MainTabView: View {
     let dependencies: AppDependencies
+    @State private var isHomeLoading = true
 
     var body: some View {
         TabView {
             Tab("tab.home", systemImage: "house") {
-                HomeView(viewModel: dependencies.makeHomeViewModel())
+                HomeView(
+                    viewModel: dependencies.makeHomeViewModel(),
+                    onLoadingStateChanged: { isLoading in
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            isHomeLoading = isLoading
+                        }
+                    }
+                )
             }
             Tab("tab.offering", systemImage: "hands.sparkles") {
                 OfferingView()
@@ -29,5 +37,6 @@ struct MainTabView: View {
             }
         }
         .tint(AppColor.primary)
+        .toolbar(isHomeLoading ? .hidden : .visible, for: .tabBar)
     }
 }

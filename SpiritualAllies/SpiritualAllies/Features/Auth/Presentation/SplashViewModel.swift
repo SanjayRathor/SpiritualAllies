@@ -20,44 +20,20 @@ final class SplashViewModel {
 
     private(set) var state: State = .authenticating
 
-    private let login: LoginUseCase
-    private let credentials: (username: String, password: String)
     /// Minimum time to keep the splash visible for brand presence.
     private let minimumDisplay: Duration
 
-    init(
-        login: LoginUseCase,
-        credentials: (username: String, password: String) = ("admin", "admin"),
-        minimumDisplay: Duration = .seconds(1.2)
-    ) {
-        self.login = login
-        self.credentials = credentials
+    init(minimumDisplay: Duration = .seconds(1.2)) {
         self.minimumDisplay = minimumDisplay
     }
 
     func start() async {
         state = .authenticating
 
-        // Keep the splash visible for a minimum duration regardless of outcome.
-        async let delay: Void? = try? await Task.sleep(for: minimumDisplay)
+        // Keep the splash visible for a minimum duration for brand presence.
+        try? await Task.sleep(for: minimumDisplay)
 
-        // Guard on connectivity first (NetworkMonitor via ToastHelper).
-        guard ToastHelper.requireNetwork() else {
-            _ = await delay
-            state = .failed(AppStrings.Error.noInternet)
-            return
-        }
-
-        do {
-            try await login.execute(username: credentials.username, password: credentials.password)
-            _ = await delay
-            ToastHelper.hideLoading()
-            state = .ready
-        } catch {
-            _ = await delay
-            let message = (error as? APIError)?.localizedDescription ?? error.localizedDescription
-            state = .failed(message)
-            ToastHelper.toast(message)
-        }
+        // Skip login API call and mark as ready directly
+        state = .ready
     }
 }

@@ -9,7 +9,26 @@ import SwiftUI
 
 struct RootView: View {
     let dependencies: AppDependencies
+    @State private var showSplash = true
+    
     var body: some View {
-        MainTabView(dependencies: dependencies)
+        ZStack {
+            if showSplash {
+                SplashView(
+                    viewModel: dependencies.makeSplashViewModel(),
+                    onReady: {
+                        withAnimation(.easeInOut(duration: 0.6)) {
+                            showSplash = false
+                        }
+                    }
+                )
+                .transition(.opacity)
+                .zIndex(1)
+            } else {
+                MainTabView(dependencies: dependencies)
+                    .transition(.opacity)
+                    .zIndex(0)
+            }
+        }
     }
 }

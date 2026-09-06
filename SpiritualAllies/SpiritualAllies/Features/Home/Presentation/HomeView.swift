@@ -9,9 +9,11 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
+    let onLoadingStateChanged: (Bool) -> Void
 
-    init(viewModel: HomeViewModel) {
+    init(viewModel: HomeViewModel, onLoadingStateChanged: @escaping (Bool) -> Void = { _ in }) {
         _viewModel = State(initialValue: viewModel)
+        self.onLoadingStateChanged = onLoadingStateChanged
     }
 
     var body: some View {
@@ -21,6 +23,10 @@ struct HomeView: View {
         }
         .animation(.easeInOut(duration: 0.6), value: viewModel.state)
         .task { await viewModel.onAppear() }
+        .onChange(of: viewModel.state) { _, newState in
+            let isLoading = newState == .loading || newState == .idle
+            onLoadingStateChanged(isLoading)
+        }
         // The hero photo bleeds behind the status bar, so force light
         // (white) status bar content for this screen specifically.
         .preferredColorScheme(.dark)
@@ -42,7 +48,7 @@ struct HomeView: View {
 
     private func dashboardScroll(_ dashboard: HomeDashboard) -> some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 15) {
+            LazyVStack(alignment: .leading, spacing: 24) {
                 HeroSection(slides: dashboard.heroes, searchText: $viewModel.searchText)
 
                 if !dashboard.stats.isEmpty {

@@ -23,8 +23,7 @@ final class AppDependencies {
     }
 
     func makeSplashViewModel() -> SplashViewModel {
-        let useCase = DefaultLoginUseCase(repository: makeAuthRepository())
-        return SplashViewModel(login: useCase)
+        return SplashViewModel()
     }
 
     // MARK: - Home

@@ -62,24 +62,8 @@ struct SplashView: View {
         switch viewModel.state {
         case .authenticating, .ready:
             ProgressView().tint(AppColor.accent)
-        case .failed(let message):
-            VStack(spacing: AppSpacing.sm) {
-                Text(message)
-                    .font(AppFont.caption(12))
-                    .foregroundStyle(AppColor.onDarkSecondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, AppSpacing.xl)
-                Button {
-                    Task { await viewModel.start() }
-                } label: {
-                    Text("common.retry")
-                        .font(AppFont.caption(15))
-                        .foregroundStyle(AppColor.primaryDark)
-                        .padding(.horizontal, AppSpacing.lg)
-                        .padding(.vertical, AppSpacing.sm)
-                        .background(Capsule().fill(AppColor.accent))
-                }
-            }
+        case .failed:
+            EmptyView()
         }
     }
 }
