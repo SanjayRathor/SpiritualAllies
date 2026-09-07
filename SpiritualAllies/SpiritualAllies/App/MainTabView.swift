@@ -24,13 +24,13 @@ struct MainTabView: View {
                 )
             }
             Tab("tab.offering", systemImage: "hands.sparkles") {
-                OfferingView()
+                OfferingView(viewModel: dependencies.makeOfferingViewModel())
             }
             Tab("tab.places", systemImage: "building.columns") {
                 PlacesView(viewModel: dependencies.makePlacesViewModel())
             }
             Tab("tab.mentors", systemImage: "person.2") {
-                MentorsView()
+                MentorsView(viewModel: dependencies.makeMentorViewModel())
             }
             Tab("tab.profile", systemImage: "person.crop.circle") {
                 ProfileView()

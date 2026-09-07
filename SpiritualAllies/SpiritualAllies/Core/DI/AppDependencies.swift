@@ -55,4 +55,34 @@ final class AppDependencies {
         let useCase = DefaultFetchSacredPlacesUseCase(repository: makePlacesRepository())
         return PlacesViewModel(fetchPlaces: useCase)
     }
+
+    // MARK: - Offering
+
+    private func makeOfferingRemoteDataSource() -> OfferingRemoteDataSource {
+        APIOfferingRemoteDataSource(client: apiClient)
+    }
+
+    private func makeOfferingRepository() -> OfferingRepository {
+        OfferingRepositoryImpl(remoteDataSource: makeOfferingRemoteDataSource())
+    }
+
+    func makeOfferingViewModel() -> OfferingViewModel {
+        let useCase = DefaultFetchOfferingsUseCase(repository: makeOfferingRepository())
+        return OfferingViewModel(fetchOfferings: useCase)
+    }
+
+    // MARK: - Mentors
+
+    private func makeMentorRemoteDataSource() -> MentorRemoteDataSource {
+        APIMentorRemoteDataSource(client: apiClient)
+    }
+
+    private func makeMentorRepository() -> MentorRepository {
+        MentorRepositoryImpl(remoteDataSource: makeMentorRemoteDataSource())
+    }
+
+    func makeMentorViewModel() -> MentorViewModel {
+        let useCase = DefaultFetchMentorsUseCase(repository: makeMentorRepository())
+        return MentorViewModel(fetchMentors: useCase)
+    }
 }
