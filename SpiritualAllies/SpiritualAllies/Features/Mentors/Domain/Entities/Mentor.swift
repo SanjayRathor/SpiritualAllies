@@ -25,6 +25,7 @@ struct Mentor: Equatable, Identifiable {
     let experience: String
     let languages: String
     let category: String
+    let tags: [String]
     let feeLabel: String?
     let rating: Double?
     let reviewCount: Int?

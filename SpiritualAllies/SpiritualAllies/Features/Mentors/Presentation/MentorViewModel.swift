@@ -28,9 +28,10 @@ final class MentorViewModel {
     var filteredMentors: [Mentor] {
         mentors.filter { mentor in
             let category = selectedCategory == "All Mentors"
+                || mentor.tags.contains { $0.localizedCaseInsensitiveContains(selectedCategory.replacingOccurrences(of: "All ", with: "")) }
                 || mentor.category.localizedCaseInsensitiveContains(selectedCategory.replacingOccurrences(of: "All ", with: ""))
             let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-            let search = query.isEmpty || [mentor.name, mentor.location, mentor.lineage, mentor.languages, mentor.category]
+            let search = query.isEmpty || ([mentor.name, mentor.location, mentor.lineage, mentor.languages, mentor.category] + mentor.tags)
                 .joined(separator: " ").localizedCaseInsensitiveContains(query)
             return category && search
         }

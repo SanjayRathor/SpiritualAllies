@@ -310,7 +310,7 @@ private struct SacredPlaceRowCard: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(place.title)
-                    .font(.system(size: 23, weight: .bold, design: .serif))
+                    .font(.system(size: 18, weight: .bold, design: .serif))
                     .foregroundStyle(AppColor.textPrimary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)

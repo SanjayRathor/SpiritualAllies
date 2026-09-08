@@ -226,7 +226,7 @@ private struct MentorRowCard: View {
             VStack(alignment: .leading, spacing: 7) {
                 HStack(alignment: .top, spacing: 8) {
                     Text(mentor.name)
-                        .font(.system(size: 20, weight: .bold, design: .serif))
+                        .font(.system(size: 18, weight: .bold, design: .serif))
                         .foregroundStyle(AppColor.textPrimary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)

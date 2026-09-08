@@ -98,6 +98,7 @@ struct MentorItemDTO: Decodable {
     let experience: String?
     let languages: String?
     let category: String?
+    let tags: [String]
     let fee: Double?
     let currency: String?
     let rating: Double?
@@ -114,6 +115,7 @@ struct MentorItemDTO: Decodable {
         experience = container.decodeString(for: [.experience, .yearsExperience, .years, .experienceYears])
         languages = container.decodeString(for: [.languages, .language, .spokenLanguages])
         category = container.decodeString(for: [.category, .categoryName, .type, .specialization])
+        tags = container.decodeStringArray(for: [.categories, .specializations, .expertise, .focusAreas, .practices, .tags])
         fee = container.decodeDouble(for: [.fee, .sessionFee, .amount, .price])
         currency = container.decodeString(for: [.currency, .currencyCode, .feeCurrency])
         rating = container.decodeDouble(for: [.rating, .averageRating, .avgRating, .score])
@@ -129,7 +131,7 @@ enum MentorCodingKey: String, CodingKey {
     case heroImage, image, backgroundImage, categories, filters, page, pageNumber, number, numberOfElements, totalElements, total, count, totalPages, pages, last, isLast
     case id, mentorId, uuid, name, fullName, spiritualName, mentorName, displayName, location, address, city, destination
     case lineage, spiritualLineage, tradition, practice, experience, yearsExperience, years, experienceYears
-    case languages, language, spokenLanguages, category, categoryName, type, specialization
+    case languages, language, spokenLanguages, category, categoryName, type, specialization, specializations, expertise, focusAreas, practices, tags
     case fee, sessionFee, amount, price, currency, currencyCode, feeCurrency
     case rating, averageRating, avgRating, score, reviewCount, reviews, ratingsCount
     case imageUrl, profilePhotoUrl, photoUrl, thumbnailUrl, gallery, verified, isVerified, verificationStatus, status
@@ -211,7 +213,8 @@ enum MentorDTOMapper {
                 lineage: item.lineage ?? "",
                 experience: item.experience ?? "",
                 languages: item.languages ?? "",
-                category: item.category ?? "Mentor",
+                category: item.category ?? item.tags.first ?? "Mentor",
+                tags: item.tags,
                 feeLabel: priceLabel(item.fee, currency: item.currency),
                 rating: item.rating,
                 reviewCount: item.reviewCount,
