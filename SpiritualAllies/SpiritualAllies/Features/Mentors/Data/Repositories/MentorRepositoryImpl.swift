@@ -12,4 +12,16 @@ final class MentorRepositoryImpl: MentorRepository {
 #endif
         return section
     }
+
+    func fetchFeatured(page: Int, size: Int) async throws -> MentorPage {
+        MentorDTOMapper.mapPage(try await remoteDataSource.fetchFeatured(page: page, size: size))
+    }
+
+    func browseMentors(query: String, category: String?, page: Int, size: Int) async throws -> MentorPage {
+        MentorDTOMapper.mapPage(try await remoteDataSource.browseMentors(query: query, category: category, page: page, size: size))
+    }
+
+    func fetchMentorDetail(id: String) async throws -> MentorDetail {
+        MentorDTOMapper.mapDetail(try await remoteDataSource.fetchMentorDetail(id: id))
+    }
 }

@@ -82,7 +82,15 @@ final class AppDependencies {
     }
 
     func makeMentorViewModel() -> MentorViewModel {
-        let useCase = DefaultFetchMentorsUseCase(repository: makeMentorRepository())
-        return MentorViewModel(fetchMentors: useCase)
+        let repository = makeMentorRepository()
+        return MentorViewModel(
+            fetchMentors: DefaultFetchMentorsUseCase(repository: repository),
+            fetchPage: DefaultFetchMentorPageUseCase(repository: repository)
+        )
+    }
+
+    func makeMentorDetailViewModel(mentorID: String) -> MentorDetailViewModel {
+        let useCase = DefaultFetchMentorDetailUseCase(repository: makeMentorRepository())
+        return MentorDetailViewModel(mentorID: mentorID, fetchDetail: useCase)
     }
 }

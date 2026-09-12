@@ -4,17 +4,23 @@ import UIKit
 
 struct MentorsView: View {
     @State private var viewModel: MentorViewModel
+    private let makeDetailViewModel: (String) -> MentorDetailViewModel
 
-    init(viewModel: MentorViewModel) {
+    init(viewModel: MentorViewModel, makeDetailViewModel: @escaping (String) -> MentorDetailViewModel) {
         _viewModel = State(initialValue: viewModel)
+        self.makeDetailViewModel = makeDetailViewModel
     }
 
     var body: some View {
         ZStack {
             AppColor.background.ignoresSafeArea()
-            content
+            NavigationStack { content }
+                .background(AppColor.background)
         }
         .task { await viewModel.onAppear() }
+        .onChange(of: viewModel.selectedCategory) { _, _ in
+            Task { await viewModel.reloadForFilter() }
+        }
         .preferredColorScheme(.light)
     }
 
@@ -49,14 +55,18 @@ struct MentorsView: View {
     }
 
     private var loadedContent: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 18) {
+        ZStack {
+            AppColor.background.ignoresSafeArea()
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 18) {
                 if let section = viewModel.section {
                     MentorHero(section: section)
                         .padding(.horizontal, -16)
                 }
 
-                MentorSearchField(text: $viewModel.searchText)
+                MentorSearchField(text: $viewModel.searchText) {
+                    Task { await viewModel.reloadForFilter() }
+                }
                 mentorCategories
 
                 Text(viewModel.resultCountText)
@@ -76,7 +86,10 @@ struct MentorsView: View {
                 } else {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.filteredMentors) { mentor in
-                            MentorRowCard(mentor: mentor)
+                            NavigationLink(value: mentor) {
+                                MentorRowCard(mentor: mentor)
+                            }
+                            .buttonStyle(.plain)
                                 .task { await viewModel.loadMoreIfNeeded(current: mentor) }
                         }
                     }
@@ -88,12 +101,16 @@ struct MentorsView: View {
                         .padding(.vertical, 12)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 110)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 110)
+            }
+            .refreshable { await viewModel.refresh() }
+            .scrollIndicators(.hidden)
+            .ignoresSafeArea(edges: .top)
         }
-        .refreshable { await viewModel.refresh() }
-        .scrollIndicators(.hidden)
-        .ignoresSafeArea(edges: .top)
+        .navigationDestination(for: Mentor.self) { mentor in
+            MentorDetailView(mentor: mentor, viewModel: makeDetailViewModel(mentor.id))
+        }
     }
 
     private var mentorCategories: some View {
@@ -122,6 +139,7 @@ struct MentorsView: View {
 
 private struct MentorSearchField: View {
     @Binding var text: String
+    let onSubmit: () -> Void
 
     var body: some View {
         HStack(spacing: 12) {
@@ -132,6 +150,7 @@ private struct MentorSearchField: View {
                 .font(AppFont.body(16))
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .onSubmit { onSubmit() }
             if !text.isEmpty {
                 Button { text = "" } label: {
                     Image(systemName: "xmark.circle.fill")

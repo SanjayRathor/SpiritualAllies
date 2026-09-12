@@ -35,8 +35,10 @@ struct SacredPicksSection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 18) {
                     ForEach(picks.items) { item in
-                        CatalogCard(item: item)
-                            .onTapGesture { onTapItem(item) }
+                        Button { onTapItem(item) } label: {
+                            CatalogCard(item: item)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }

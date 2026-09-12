@@ -14,6 +14,91 @@ struct MentorResponseDTO: Decodable {
     }
 }
 
+struct MentorPageResponseDTO: Decodable {
+    let page: MentorPageDTO
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: MentorCodingKey.self)
+        let catalog = try? container.decodeIfPresent(MentorCatalogDTO.self, forKey: .catalog)
+        if let featured = catalog?.featured {
+            page = featured
+        } else if let items = catalog?.items {
+            page = items
+        } else {
+            page = MentorPageDTO(
+                content: container.decodeArray(for: [.content, .items, .mentors, .results]) ?? [],
+                page: container.decodeInt(for: [.page, .pageNumber, .number]),
+                totalElements: container.decodeInt(for: [.totalElements, .total, .count]),
+                totalPages: container.decodeInt(for: [.totalPages, .pages]),
+                last: container.decodeBool(for: [.last, .isLast])
+            )
+        }
+    }
+}
+
+struct MentorDetailResponseDTO: Decodable {
+    let detail: MentorDetailPayloadDTO
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: MentorCodingKey.self)
+        detail = (try? container.decodeIfPresent(MentorDetailPayloadDTO.self, forKey: .data))
+            ?? (try? container.decodeIfPresent(MentorDetailPayloadDTO.self, forKey: .guru))
+            ?? MentorDetailPayloadDTO(container: container)
+    }
+}
+
+struct MentorDetailPayloadDTO: Decodable {
+    let id: String?
+    let name: String?
+    let imagePath: String?
+    let verified: Bool
+    let featured: Bool
+    let headline: String?
+    let lineage: String?
+    let rating: Double?
+    let reviewCount: Int?
+    let experience: String?
+    let students: String?
+    let since: String?
+    let languages: String?
+    let location: String?
+    let about: String?
+    let teachingFocus: [String]
+    let catalogLive: String?
+    let posts: String?
+    let trust: String?
+    let followers: String?
+    let retreatsCount: String?
+    let fee: Double?
+    let currency: String?
+
+    init(container: KeyedDecodingContainer<MentorCodingKey>) {
+        id = container.decodeString(for: [.id, .mentorId, .guruId, .uuid])
+        name = container.decodeString(for: [.name, .fullName, .spiritualName, .mentorName, .displayName, .title])
+        imagePath = container.decodeImagePath(for: [.image, .imageUrl, .profilePhotoUrl, .photoUrl, .thumbnailUrl, .gallery])
+        verified = container.decodeBool(for: [.verified, .isVerified]) ?? false
+        featured = container.decodeBool(for: [.featured, .isFeatured]) ?? false
+        headline = container.decodeString(for: [.headline, .tagline, .specialization, .practice])
+        lineage = container.decodeString(for: [.lineage, .spiritualLineage, .tradition])
+        rating = container.decodeDouble(for: [.rating, .averageRating, .avgRating, .score])
+        reviewCount = container.decodeInt(for: [.reviewCount, .reviews, .ratingsCount])
+        experience = container.decodeString(for: [.experience, .yearsExperience, .years, .experienceYears])
+        students = container.decodeString(for: [.students, .studentCount])
+        since = container.decodeString(for: [.since, .memberSince, .joinedSince])
+        languages = container.decodeString(for: [.languages, .language, .spokenLanguages])
+        location = container.decodeString(for: [.location, .address, .city])
+        about = container.decodeString(for: [.about, .bio, .description])
+        teachingFocus = container.decodeStringArray(for: [.teachingFocus, .focusAreas, .practices, .tags, .specializations])
+        catalogLive = container.decodeString(for: [.catalogLive, .publishedOfferings, .offeringsCount])
+        posts = container.decodeString(for: [.posts, .publishedPosts, .postsCount])
+        trust = container.decodeString(for: [.trust, .trustScore])
+        followers = container.decodeString(for: [.followers, .followerCount])
+        retreatsCount = container.decodeString(for: [.retreats, .retreatsCount])
+        fee = container.decodeDouble(for: [.fee, .sessionFee, .amount, .price])
+        currency = container.decodeString(for: [.currency, .currencyCode, .feeCurrency])
+    }
+}
+
 private struct MentorEnvelopeDTO: Decodable {
     let catalog: MentorCatalogDTO?
     let session: MentorSessionDTO?
@@ -127,14 +212,15 @@ struct MentorItemDTO: Decodable {
 }
 
 enum MentorCodingKey: String, CodingKey {
-    case data, catalog, featured, items, content, mentors, results, session, eyebrow, label, title, heading, subtitle, description
+    case data, guru, catalog, featured, items, content, mentors, results, session, eyebrow, label, title, heading, subtitle, description
     case heroImage, image, backgroundImage, categories, filters, page, pageNumber, number, numberOfElements, totalElements, total, count, totalPages, pages, last, isLast
-    case id, mentorId, uuid, name, fullName, spiritualName, mentorName, displayName, location, address, city, destination
-    case lineage, spiritualLineage, tradition, practice, experience, yearsExperience, years, experienceYears
-    case languages, language, spokenLanguages, category, categoryName, type, specialization, specializations, expertise, focusAreas, practices, tags
+    case id, mentorId, guruId, uuid, name, fullName, spiritualName, mentorName, displayName, location, address, city, destination
+    case lineage, spiritualLineage, tradition, practice, experience, yearsExperience, years, experienceYears, headline, tagline
+    case languages, language, spokenLanguages, category, categoryName, type, specialization, specializations, expertise, focusAreas, practices, tags, teachingFocus
     case fee, sessionFee, amount, price, currency, currencyCode, feeCurrency
-    case rating, averageRating, avgRating, score, reviewCount, reviews, ratingsCount
-    case imageUrl, profilePhotoUrl, photoUrl, thumbnailUrl, gallery, verified, isVerified, verificationStatus, status
+    case rating, averageRating, avgRating, score, reviewCount, reviews, ratingsCount, students, studentCount, since, memberSince, joinedSince
+    case imageUrl, profilePhotoUrl, photoUrl, thumbnailUrl, gallery, verified, isVerified, verificationStatus, status, isFeatured
+    case about, bio, catalogLive, publishedOfferings, offeringsCount, posts, publishedPosts, postsCount, trust, trustScore, followers, followerCount, retreats, retreatsCount
 }
 
 struct MentorImageDTO: Decodable {
@@ -233,6 +319,63 @@ enum MentorDTOMapper {
             totalCount: source.page.totalElements,
             categories: categories,
             page: MentorPage(items: items, pageNumber: source.page.page ?? 0, totalElements: source.page.totalElements, isLast: source.page.isLast)
+        )
+    }
+
+    static func mapPage(_ dto: MentorPageResponseDTO) -> MentorPage {
+        MentorPage(
+            items: dto.page.content.compactMap(map),
+            pageNumber: dto.page.page ?? 0,
+            totalElements: dto.page.totalElements,
+            isLast: dto.page.isLast
+        )
+    }
+
+    static func mapDetail(_ dto: MentorDetailResponseDTO) -> MentorDetail {
+        let source = dto.detail
+        let name = source.name ?? "Mentor"
+        return MentorDetail(
+            id: source.id ?? name,
+            name: name,
+            imagePath: source.imagePath,
+            verified: source.verified,
+            featured: source.featured,
+            headline: source.headline ?? "",
+            lineage: source.lineage ?? "",
+            rating: source.rating,
+            reviewCount: source.reviewCount,
+            experience: source.experience ?? "",
+            students: source.students ?? "0",
+            since: source.since ?? "",
+            languages: source.languages ?? "",
+            location: source.location ?? "",
+            about: source.about ?? "",
+            teachingFocus: source.teachingFocus,
+            catalogLive: source.catalogLive ?? "0",
+            posts: source.posts ?? "0",
+            trust: source.trust ?? "0%",
+            followers: source.followers ?? "0",
+            retreatsCount: source.retreatsCount ?? "0",
+            feeLabel: priceLabel(source.fee, currency: source.currency)
+        )
+    }
+
+    private static func map(_ item: MentorItemDTO) -> Mentor? {
+        guard let name = item.name, !name.isEmpty else { return nil }
+        return Mentor(
+            id: item.id ?? name,
+            name: name,
+            location: item.location ?? "",
+            lineage: item.lineage ?? "",
+            experience: item.experience ?? "",
+            languages: item.languages ?? "",
+            category: item.category ?? item.tags.first ?? "Mentor",
+            tags: item.tags,
+            feeLabel: priceLabel(item.fee, currency: item.currency),
+            rating: item.rating,
+            reviewCount: item.reviewCount,
+            imagePath: item.imagePath,
+            verified: item.verified ?? false
         )
     }
 

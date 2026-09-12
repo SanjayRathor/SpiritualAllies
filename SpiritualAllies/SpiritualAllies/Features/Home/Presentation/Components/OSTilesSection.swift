@@ -42,14 +42,18 @@ struct OSTilesSection: View {
             }
 
             if let featured = section.tiles.first {
-                tile(featured, height: 230, featured: true)
-                    .onTapGesture { onTap(featured) }
+                Button { onTap(featured) } label: {
+                    tile(featured, height: 230, featured: true)
+                }
+                .buttonStyle(.plain)
             }
 
             LazyVGrid(columns: columns, spacing: 18) {
                 ForEach(section.tiles.dropFirst()) { item in
-                    tile(item, height: 154, featured: false)
-                        .onTapGesture { onTap(item) }
+                    Button { onTap(item) } label: {
+                        tile(item, height: 154, featured: false)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }

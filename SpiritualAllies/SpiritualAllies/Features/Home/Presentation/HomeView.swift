@@ -9,10 +9,12 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
+    let onSelectTab: (AppTab) -> Void
     let onLoadingStateChanged: (Bool) -> Void
 
-    init(viewModel: HomeViewModel, onLoadingStateChanged: @escaping (Bool) -> Void = { _ in }) {
+    init(viewModel: HomeViewModel, onSelectTab: @escaping (AppTab) -> Void = { _ in }, onLoadingStateChanged: @escaping (Bool) -> Void = { _ in }) {
         _viewModel = State(initialValue: viewModel)
+        self.onSelectTab = onSelectTab
         self.onLoadingStateChanged = onLoadingStateChanged
     }
 
@@ -56,11 +58,15 @@ struct HomeView: View {
                 }
 
                 if !dashboard.osSection.tiles.isEmpty {
-                    OSTilesSection(section: dashboard.osSection)
+                    OSTilesSection(section: dashboard.osSection) { tile in
+                        if let tab = tab(for: tile) {
+                            onSelectTab(tab)
+                        }
+                    }
                 }
 
                 if !dashboard.sacredPicks.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.sacredPicks)
+                    SacredPicksSection(picks: dashboard.sacredPicks, onSeeAll: { onSelectTab(.offering) }, onTapItem: { _ in onSelectTab(.offering) })
                 }
 
                 if !dashboard.sacredEvents.items.isEmpty {
@@ -68,7 +74,7 @@ struct HomeView: View {
                 }
 
                 if !dashboard.sacredPlaces.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.sacredPlaces)
+                    SacredPicksSection(picks: dashboard.sacredPlaces, onSeeAll: { onSelectTab(.places) }, onTapItem: { _ in onSelectTab(.places) })
                 }
 
                 if !dashboard.pilgrimages.items.isEmpty {
@@ -76,7 +82,7 @@ struct HomeView: View {
                 }
 
                 if !dashboard.mentors.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.mentors)
+                    SacredPicksSection(picks: dashboard.mentors, onSeeAll: { onSelectTab(.mentors) }, onTapItem: { _ in onSelectTab(.mentors) })
                 }
 
                 if let panchang = dashboard.panchang {
@@ -133,6 +139,18 @@ struct HomeView: View {
         )
         .padding(.horizontal, AppSpacing.lg)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func tab(for tile: HomeOSTile) -> AppTab? {
+        let destination = "\(tile.route) \(tile.title)".lowercased()
+        if destination.contains("mentor") || destination.contains("guru") { return .mentors }
+        if destination.contains("event") || destination.contains("pilgrim") || destination.contains("retreat") {
+            return nil
+        }
+        if destination.contains("place") {
+            return .places
+        }
+        return .offering
     }
 
     private var background: some View {

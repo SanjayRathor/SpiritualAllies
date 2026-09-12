@@ -7,15 +7,21 @@
 
 import SwiftUI
 
+enum AppTab: Hashable {
+    case home, offering, places, mentors, profile
+}
+
 struct MainTabView: View {
     let dependencies: AppDependencies
     @State private var isHomeLoading = true
+    @State private var selectedTab: AppTab = .home
 
     var body: some View {
-        TabView {
-            Tab("tab.home", systemImage: "house") {
+        TabView(selection: $selectedTab) {
+            Tab("tab.home", systemImage: "house", value: .home) {
                 HomeView(
                     viewModel: dependencies.makeHomeViewModel(),
+                    onSelectTab: { selectedTab = $0 },
                     onLoadingStateChanged: { isLoading in
                         withAnimation(.easeInOut(duration: 0.3)) {
                             isHomeLoading = isLoading
@@ -23,16 +29,19 @@ struct MainTabView: View {
                     }
                 )
             }
-            Tab("tab.offering", systemImage: "hands.sparkles") {
+            Tab("tab.offering", systemImage: "hands.sparkles", value: .offering) {
                 OfferingView(viewModel: dependencies.makeOfferingViewModel())
             }
-            Tab("tab.places", systemImage: "building.columns") {
+            Tab("tab.places", systemImage: "building.columns", value: .places) {
                 PlacesView(viewModel: dependencies.makePlacesViewModel())
             }
-            Tab("tab.mentors", systemImage: "person.2") {
-                MentorsView(viewModel: dependencies.makeMentorViewModel())
+            Tab("tab.mentors", systemImage: "person.2", value: .mentors) {
+                MentorsView(
+                    viewModel: dependencies.makeMentorViewModel(),
+                    makeDetailViewModel: { mentorID in dependencies.makeMentorDetailViewModel(mentorID: mentorID) }
+                )
             }
-            Tab("tab.profile", systemImage: "person.crop.circle") {
+            Tab("tab.profile", systemImage: "person.crop.circle", value: .profile) {
                 ProfileView()
             }
         }
