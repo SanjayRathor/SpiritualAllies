@@ -9,19 +9,22 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
+    @State private var selectedMentor: Mentor?
     let onSelectTab: (AppTab) -> Void
+    let makeMentorDetailViewModel: (String) -> MentorDetailViewModel
     let onLoadingStateChanged: (Bool) -> Void
 
-    init(viewModel: HomeViewModel, onSelectTab: @escaping (AppTab) -> Void = { _ in }, onLoadingStateChanged: @escaping (Bool) -> Void = { _ in }) {
+    init(viewModel: HomeViewModel, onSelectTab: @escaping (AppTab) -> Void = { _ in }, makeMentorDetailViewModel: @escaping (String) -> MentorDetailViewModel, onLoadingStateChanged: @escaping (Bool) -> Void = { _ in }) {
         _viewModel = State(initialValue: viewModel)
         self.onSelectTab = onSelectTab
+        self.makeMentorDetailViewModel = makeMentorDetailViewModel
         self.onLoadingStateChanged = onLoadingStateChanged
     }
 
     var body: some View {
         ZStack {
             background
-            content
+            NavigationStack { content }
         }
         .animation(.easeInOut(duration: 0.6), value: viewModel.state)
         .task { await viewModel.onAppear() }
@@ -49,8 +52,10 @@ struct HomeView: View {
     }
 
     private func dashboardScroll(_ dashboard: HomeDashboard) -> some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 24) {
+        ZStack {
+            AppColor.background.ignoresSafeArea()
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 24) {
                 HeroSection(slides: dashboard.heroes, searchText: $viewModel.searchText)
 
                 if !dashboard.stats.isEmpty {
@@ -82,7 +87,11 @@ struct HomeView: View {
                 }
 
                 if !dashboard.mentors.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.mentors, onSeeAll: { onSelectTab(.mentors) }, onTapItem: { _ in onSelectTab(.mentors) })
+                    SacredPicksSection(
+                        picks: dashboard.mentors,
+                        onSeeAll: { onSelectTab(.mentors) },
+                        onTapItem: { item in selectedMentor = mentor(from: item) }
+                    )
                 }
 
                 if let panchang = dashboard.panchang {
@@ -93,10 +102,35 @@ struct HomeView: View {
                     DiscoveryCTASection(cta: dashboard.discoveryCTA)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.bottom, 120)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 120)
+            }
+            .scrollIndicators(.hidden)
         }
         .ignoresSafeArea(edges: .top)
+        .navigationDestination(item: $selectedMentor) { mentor in
+            MentorDetailView(mentor: mentor, viewModel: makeMentorDetailViewModel(mentor.id))
+        }
+    }
+
+    private func mentor(from item: HomeCatalogItem) -> Mentor? {
+        let path = item.route.split(separator: "/").map(String.init)
+        guard let id = path.last, !id.isEmpty, id != "mentors" else { return nil }
+        return Mentor(
+            id: id,
+            name: item.title,
+            location: item.location,
+            lineage: item.category,
+            experience: "",
+            languages: "",
+            category: item.category,
+            tags: [item.category],
+            feeLabel: item.priceLabel,
+            rating: item.rating,
+            reviewCount: nil,
+            imagePath: item.imagePath,
+            verified: item.verified
+        )
     }
 
     private func errorView(_ message: String) -> some View {
