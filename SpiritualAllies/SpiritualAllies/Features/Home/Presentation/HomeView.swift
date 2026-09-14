@@ -10,6 +10,8 @@ import SwiftUI
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
     @State private var selectedMentor: Mentor?
+    @State private var selectedPanchang: HomePanchang?
+    @State private var isPanchangPresented = false
     let onSelectTab: (AppTab) -> Void
     let makeMentorDetailViewModel: (String) -> MentorDetailViewModel
     let onLoadingStateChanged: (Bool) -> Void
@@ -56,7 +58,14 @@ struct HomeView: View {
             AppColor.background.ignoresSafeArea()
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 24) {
-                HeroSection(slides: dashboard.heroes, searchText: $viewModel.searchText)
+                HeroSection(
+                    slides: dashboard.heroes,
+                    searchText: $viewModel.searchText,
+                    onOpenPanchang: {
+                        selectedPanchang = dashboard.panchang
+                        isPanchangPresented = true
+                    }
+                )
 
                 if !dashboard.stats.isEmpty {
                     StatsSection(stats: dashboard.stats)
@@ -110,6 +119,9 @@ struct HomeView: View {
         .ignoresSafeArea(edges: .top)
         .navigationDestination(item: $selectedMentor) { mentor in
             MentorDetailView(mentor: mentor, viewModel: makeMentorDetailViewModel(mentor.id))
+        }
+        .navigationDestination(isPresented: $isPanchangPresented) {
+            PanchangView(panchang: selectedPanchang)
         }
     }
 

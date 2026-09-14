@@ -13,6 +13,7 @@ struct HeroSection: View {
     @Binding var searchText: String
     var onSeek: () -> Void = {}
     var onPromptTap: (String) -> Void = { _ in }
+    var onOpenPanchang: () -> Void = {}
 
     @State private var selectedIndex = 0
 
@@ -138,6 +139,16 @@ struct HeroSection: View {
             }
 
             Spacer(minLength: 8)
+
+            Button(action: onOpenPanchang) {
+                Image(systemName: "calendar")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(AppColor.accentSoft)
+                    .frame(width: 40, height: 40)
+                    .background(Circle().fill(AppColor.primaryDark.opacity(0.55)))
+                    .overlay(Circle().stroke(Color.white.opacity(0.18), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
 
             Button(action: {}) {
                 Image(systemName: "bell")
