@@ -26,8 +26,15 @@ final class RemoteImageLoader {
         if path.hasPrefix("http://") || path.hasPrefix("https://") {
             return URL(string: path)
         }
-        let trimmed = path.hasPrefix("/") ? String(path.dropFirst()) : path
-        return AppEnvironment.current.imageBaseURL.appendingPathComponent(trimmed)
+
+        // Resolve as a relative URL instead of using appendingPathComponent.
+        // The latter percent-encodes `?w=300` as part of the filename, causing
+        // thumbnail URLs from the dashboard API to return the wrong resource.
+        let relativePath = path.hasPrefix("/") ? path : "/\(path)"
+        return URL(
+            string: relativePath,
+            relativeTo: AppEnvironment.current.imageBaseURL
+        )?.absoluteURL
     }
 
     func load(path: String?) {

@@ -14,6 +14,8 @@ struct HomeDashboard: Equatable {
     let heroes: [HomeHero]
     let stats: [HomeStat]
     let osSection: HomeOSSection
+    let intentions: HomeSacredPicks
+    let howItWorks: HomeSacredPicks
     let sacredPicks: HomeSacredPicks
     let sacredEvents: HomeSacredPicks
     let sacredPlaces: HomeSacredPicks
@@ -98,7 +100,7 @@ struct HomeCatalogItem: Equatable, Identifiable {
     let imagePath: String?
     let route: String
 
-    var id: String { route.isEmpty ? title : route }
+    var id: String { "\(route)-\(title)" }
 }
 
 struct HomeDiscoveryCTA: Equatable {

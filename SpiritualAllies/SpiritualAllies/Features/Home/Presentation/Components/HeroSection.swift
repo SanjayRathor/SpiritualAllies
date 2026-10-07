@@ -47,7 +47,7 @@ struct HeroSection: View {
 
             VStack(spacing: AppSpacing.sm) {
                 // The seek bar stays fixed while the feature content changes.
-                searchBar(placeholder: "What is your heart seeking?", actionLabel: "Seek")
+                searchBar(placeholder: currentSlide?.searchPlaceholder ?? "What is your heart seeking?", actionLabel: currentSlide?.searchActionLabel ?? "Seek")
                 fixedTags
                 pageIndicator
             }
@@ -63,6 +63,10 @@ struct HeroSection: View {
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
         .animation(.easeInOut(duration: 0.35), value: selectedIndex)
+    }
+
+    private var currentSlide: HomeHero? {
+        slides.indices.contains(selectedIndex) ? slides[selectedIndex] : slides.first
     }
 
     private func heroCard(for slide: HomeHero) -> some View {
@@ -201,13 +205,7 @@ struct HeroSection: View {
     private var fixedTags: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: AppSpacing.sm) {
-                ForEach([
-                    "Healing After Burnout",
-                    "Home Satyanarayan Puja",
-                    "Find A Vipassana Guide",
-                    "Kerala Ayurveda Retreat",
-                    "Ganga Aarti For Family"
-                ], id: \.self) { tag in
+                ForEach(currentSlide?.prompts ?? [], id: \.self) { tag in
                     Button {
                         onPromptTap(tag)
                     } label: {

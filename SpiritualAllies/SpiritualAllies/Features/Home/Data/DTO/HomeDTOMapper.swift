@@ -10,6 +10,10 @@ import Foundation
 
 enum HomeDTOMapper {
     static func map(_ dto: HomeResponseDTO) -> HomeDashboard {
+        if let data = dto.data {
+            return mapLandingDashboard(data)
+        }
+
         let dashboard = dto.dashboard
         let heroes = mapFeatures(dto.catalog?.features)
             ?? dashboard?.hero.map { [mapHero($0)] }
@@ -22,6 +26,8 @@ enum HomeDTOMapper {
                 ?? [],
             osSection: dashboard?.osSection.map(mapOSSection)
                 ?? mapPath(dto.catalog?.path),
+            intentions: emptyPicks,
+            howItWorks: emptyPicks,
             sacredPicks: dashboard?.sacredPicks.map(mapSacredPicks)
                 ?? mapOfferings(dto.catalog?.offerings),
             sacredEvents: mapSacredEvents(dto.catalog?.sacredEvents),
@@ -31,6 +37,96 @@ enum HomeDTOMapper {
             panchang: mapPanchang(dto.catalog?.panchang),
             discoveryCTA: mapDiscoveryCTA(dashboard?.discoveryCta)
         )
+    }
+
+    private static var emptyPicks: HomeSacredPicks {
+        HomeSacredPicks(eyebrow: "", title: "", subtitle: "", seeAllLabel: "", items: [])
+    }
+
+    private static func mapLandingDashboard(_ data: LandingDashboardDTO) -> HomeDashboard {
+        let sections = data.sections.sorted { $0.displayOrder < $1.displayOrder }
+        let hero = sections.first { $0.type == "CAROUSEL" }
+        let stats = sections.first { $0.type == "STATS" }
+        let path = sections.first { $0.type == "PATH_GRID" }
+        let intentions = sections.first { $0.type == "INTENTIONS" }
+        let steps = sections.first { $0.type == "STEPS" }
+        let featured = sections.filter { $0.type == "FEATURED" }
+        let cta = sections.first { $0.type == "CTA" }
+
+        return HomeDashboard(
+            heroes: landingHeroes(hero),
+            stats: (stats?.items ?? []).sorted { $0.displayOrder < $1.displayOrder }.map {
+                HomeStat(value: $0.value ?? "", label: $0.label ?? $0.title ?? "", sub: $0.label ?? $0.title ?? "", icon: $0.icon ?? "")
+            },
+            osSection: HomeOSSection(
+                eyebrow: path?.subtitle ?? "",
+                title: path?.title ?? "",
+                subtitle: path?.content ?? "",
+                tiles: (path?.items ?? []).sorted { $0.displayOrder < $1.displayOrder }.map {
+                    HomeOSTile(id: $0.id, title: $0.title ?? "", subtitle: $0.subtitle ?? $0.content ?? "", icon: $0.icon, imagePath: $0.image?.displayUrl, route: $0.uri ?? "", displayOrder: $0.displayOrder)
+                }
+            ),
+            intentions: landingPicks(intentions, actionLabel: intentions?.chips?.first ?? "Explore"),
+            howItWorks: landingPicks(steps, actionLabel: ""),
+            sacredPicks: landingPicks(featured.first { $0.id == "offerings" }, actionLabel: "Browse offerings"),
+            sacredEvents: landingPicks(featured.first { $0.id.contains("event") }, actionLabel: "Browse events"),
+            sacredPlaces: landingPicks(featured.first { $0.id == "temple-ghats" }, actionLabel: "Explore all"),
+            pilgrimages: landingPicks(featured.first { $0.id.contains("pilgrimage") }, actionLabel: "Browse pilgrimages"),
+            mentors: landingPicks(featured.first { $0.id == "meet-purohits" }, actionLabel: "View all mentors"),
+            panchang: nil,
+            discoveryCTA: HomeDiscoveryCTA(
+                eyebrow: cta?.subtitle ?? "",
+                title: cta?.title ?? "",
+                subtitle: cta?.content ?? "",
+                ctaLabel: cta?.chips?.first ?? cta?.items?.first?.title ?? "",
+                backgroundImagePath: cta?.image?.displayUrl
+            )
+        )
+    }
+
+    private static func landingHeroes(_ section: LandingSectionDTO?) -> [HomeHero] {
+        guard let section else { return [] }
+        return (section.items ?? []).sorted { $0.displayOrder < $1.displayOrder }.map {
+            HomeHero(
+                brandMark: "श्री",
+                brandName: section.title ?? "SpiritualAllies",
+                tagline: section.subtitle ?? "Transform · Heal · Awaken",
+                eyebrow: $0.label ?? $0.subtitle ?? "",
+                title: $0.title ?? "",
+                subtitle: $0.content ?? "",
+                heroImagePath: $0.image?.displayUrl ?? section.image?.displayUrl,
+                searchPlaceholder: section.content ?? "What is your heart seeking?",
+                searchActionLabel: "Seek",
+                prompts: section.chips ?? []
+            )
+        }
+    }
+
+    private static func landingPicks(_ section: LandingSectionDTO?, actionLabel: String) -> HomeSacredPicks {
+        guard let section else { return emptyPicks }
+        return HomeSacredPicks(
+            eyebrow: section.subtitle ?? "",
+            title: section.title ?? "",
+            subtitle: section.content ?? "",
+            seeAllLabel: actionLabel,
+            items: (section.items ?? []).sorted { $0.displayOrder < $1.displayOrder }.map {
+                HomeCatalogItem(
+                    title: $0.title ?? "",
+                    location: $0.content ?? "",
+                    category: $0.label ?? $0.subtitle ?? "",
+                    priceLabel: ($0.value?.contains("★") == true) ? nil : $0.value,
+                    rating: rating(from: $0.value),
+                    verified: false,
+                    imagePath: $0.image?.displayUrl ?? section.image?.displayUrl,
+                    route: $0.uri ?? section.uri ?? ""
+                )
+            }
+        )
+    }
+
+    private static func rating(from value: String?) -> Double? {
+        guard let value, value.contains("★") else { return nil }
+        return Double(value.replacingOccurrences(of: "★", with: "").trimmingCharacters(in: .whitespaces))
     }
 
     private static func mapFeatures(_ groups: [CatalogFeatureGroupDTO]?) -> [HomeHero]? {

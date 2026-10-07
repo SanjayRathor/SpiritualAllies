@@ -24,9 +24,14 @@ struct HomeView: View {
     }
 
     var body: some View {
-        ZStack {
-            background
-            NavigationStack { content }
+        NavigationStack {
+            ZStack {
+                // Keep the page background inside NavigationStack. A background
+                // placed behind it is covered by the stack's opaque dark canvas
+                // while the dashboard is still loading.
+                background
+                content
+            }
         }
         .animation(.easeInOut(duration: 0.6), value: viewModel.state)
         .task { await viewModel.onAppear() }
@@ -43,7 +48,7 @@ struct HomeView: View {
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            // Loading is shown via ToastHelper's themed HUD; keep the canvas clean.
+            // Loading is shown via ToastHelper over the themed page background.
             Color.clear
         case .failed(let message):
             errorView(message)
@@ -77,6 +82,14 @@ struct HomeView: View {
                             onSelectTab(tab)
                         }
                     }
+                }
+
+                if !dashboard.intentions.items.isEmpty {
+                    SacredPicksSection(picks: dashboard.intentions)
+                }
+
+                if !dashboard.howItWorks.items.isEmpty {
+                    SacredPicksSection(picks: dashboard.howItWorks)
                 }
 
                 if !dashboard.sacredPicks.items.isEmpty {

@@ -14,8 +14,55 @@ import Foundation
 
 /// Top-level response of GET /api/mobile/screen?section=landing.
 struct HomeResponseDTO: Decodable {
+    let ok: Bool?
+    let data: LandingDashboardDTO?
     let catalog: CatalogDTO?
     let dashboard: DashboardDTO?
+}
+
+// MARK: - Mobile v1 dashboard
+
+/// Response payload returned by GET /api/mobile/v1/dashboard.
+struct LandingDashboardDTO: Decodable {
+    let version: String?
+    let sections: [LandingSectionDTO]
+}
+
+struct LandingSectionDTO: Decodable {
+    let id: String
+    let type: String
+    let displayOrder: Int
+    let title: String?
+    let subtitle: String?
+    let content: String?
+    let uri: String?
+    let chips: [String]?
+    let image: LandingImageDTO?
+    let items: [LandingItemDTO]?
+}
+
+struct LandingItemDTO: Decodable {
+    let id: String
+    let displayOrder: Int
+    let title: String?
+    let subtitle: String?
+    let content: String?
+    let uri: String?
+    let value: String?
+    let label: String?
+    let icon: String?
+    let chips: [String]?
+    let image: LandingImageDTO?
+}
+
+struct LandingImageDTO: Decodable {
+    let thumbnailUrl: String?
+    let alt: String?
+    let imageUrl: String?
+    let objectPosition: String?
+
+    /// Prefer the smaller Home-screen asset and fall back to the full image.
+    var displayUrl: String? { thumbnailUrl ?? imageUrl }
 }
 
 struct DashboardDTO: Decodable {
