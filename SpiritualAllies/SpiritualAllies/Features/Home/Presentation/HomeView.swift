@@ -42,9 +42,6 @@ struct HomeView: View {
             let isLoading = newState == .loading || newState == .idle
             onLoadingStateChanged(isLoading)
         }
-        // The hero photo bleeds behind the status bar, so force light
-        // (white) status bar content for this screen specifically.
-        .preferredColorScheme(.dark)
     }
 
     @ViewBuilder

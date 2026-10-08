@@ -22,7 +22,6 @@ struct PlacesView: View {
             content
         }
         .task { await viewModel.onAppear() }
-        .preferredColorScheme(.dark)
     }
 
     @ViewBuilder

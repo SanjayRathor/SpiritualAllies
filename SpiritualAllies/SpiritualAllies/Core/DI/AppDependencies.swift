@@ -78,6 +78,11 @@ final class AppDependencies {
         return OfferingViewModel(fetchOfferings: useCase)
     }
 
+    func makeOfferingDetailViewModel(offeringID: String) -> OfferingDetailViewModel {
+        let useCase = DefaultFetchOfferingDetailUseCase(repository: makeOfferingRepository())
+        return OfferingDetailViewModel(offeringID: offeringID, fetchDetail: useCase)
+    }
+
     // MARK: - Mentors
 
     private func makeMentorRemoteDataSource() -> MentorRemoteDataSource {

@@ -32,7 +32,12 @@ struct MainTabView: View {
                 )
             }
             Tab("tab.offering", systemImage: "hands.sparkles", value: .offering) {
-                OfferingView(viewModel: dependencies.makeOfferingViewModel())
+                OfferingView(
+                    viewModel: dependencies.makeOfferingViewModel(),
+                    makeDetailViewModel: { offeringID in
+                        dependencies.makeOfferingDetailViewModel(offeringID: offeringID)
+                    }
+                )
             }
             Tab("tab.places", systemImage: "building.columns", value: .places) {
                 PlacesView(viewModel: dependencies.makePlacesViewModel())

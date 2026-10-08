@@ -27,6 +27,7 @@ struct SpiritualAlliesApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(dependencies: dependencies)
+                .preferredColorScheme(.light)
         }
     }
 }

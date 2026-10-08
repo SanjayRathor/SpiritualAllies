@@ -7,6 +7,7 @@ import Foundation
 
 protocol OfferingRemoteDataSource: Sendable {
     func fetchOfferings(page: Int, size: Int) async throws -> OfferingResponseDTO
+    func fetchOfferingDetail(id: String) async throws -> OfferingDetailResponseDTO
 }
 
 final class APIOfferingRemoteDataSource: OfferingRemoteDataSource {
@@ -35,5 +36,10 @@ final class APIOfferingRemoteDataSource: OfferingRemoteDataSource {
 #endif
 
         return try await client.request(endpoint, as: OfferingResponseDTO.self)
+    }
+
+    func fetchOfferingDetail(id: String) async throws -> OfferingDetailResponseDTO {
+        let endpoint = Endpoint(path: "mobile/v1/offerings/\(id)")
+        return try await client.request(endpoint, as: OfferingDetailResponseDTO.self)
     }
 }

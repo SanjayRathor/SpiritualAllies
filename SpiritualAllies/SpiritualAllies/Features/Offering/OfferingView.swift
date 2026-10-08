@@ -9,15 +9,23 @@ import UIKit
 
 struct OfferingView: View {
     @State private var viewModel: OfferingViewModel
+    @State private var selectedOfferingID: String?
+    let makeDetailViewModel: (String) -> OfferingDetailViewModel
 
-    init(viewModel: OfferingViewModel) {
+    init(viewModel: OfferingViewModel, makeDetailViewModel: @escaping (String) -> OfferingDetailViewModel) {
         _viewModel = State(initialValue: viewModel)
+        self.makeDetailViewModel = makeDetailViewModel
     }
 
     var body: some View {
-        ZStack {
-            AppColor.background.ignoresSafeArea()
-            content
+        NavigationStack {
+            ZStack {
+                AppColor.background.ignoresSafeArea()
+                content
+            }
+            .navigationDestination(item: $selectedOfferingID) { offeringID in
+                OfferingDetailView(viewModel: makeDetailViewModel(offeringID))
+            }
         }
         .task { await viewModel.onAppear() }
         .preferredColorScheme(.light)
@@ -56,7 +64,10 @@ struct OfferingView: View {
                 } else {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.filteredOfferings) { offering in
-                            OfferingRowCard(offering: offering)
+                            Button { selectedOfferingID = offering.id } label: {
+                                OfferingRowCard(offering: offering)
+                            }
+                            .buttonStyle(.plain)
                                 .task { await viewModel.loadMoreIfNeeded(current: offering) }
                         }
                     }
