@@ -95,7 +95,7 @@ enum HomeDTOMapper {
                 title: $0.title ?? "",
                 subtitle: $0.content ?? "",
                 heroImagePath: $0.image?.displayUrl ?? section.image?.displayUrl,
-                searchPlaceholder: section.content ?? "What is your heart seeking?",
+                searchPlaceholder: "Search places, rituals, mentors & retreats",
                 searchActionLabel: "Seek",
                 prompts: section.chips ?? []
             )

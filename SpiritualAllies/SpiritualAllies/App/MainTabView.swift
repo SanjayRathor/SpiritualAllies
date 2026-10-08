@@ -23,6 +23,7 @@ struct MainTabView: View {
                     viewModel: dependencies.makeHomeViewModel(),
                     onSelectTab: { selectedTab = $0 },
                     makeMentorDetailViewModel: { mentorID in dependencies.makeMentorDetailViewModel(mentorID: mentorID) },
+                    makeSearchViewModel: { query in dependencies.makeSearchViewModel(initialQuery: query) },
                     onLoadingStateChanged: { isLoading in
                         withAnimation(.easeInOut(duration: 0.3)) {
                             isHomeLoading = isLoading

@@ -12,14 +12,17 @@ struct HomeView: View {
     @State private var selectedMentor: Mentor?
     @State private var selectedPanchang: HomePanchang?
     @State private var isPanchangPresented = false
+    @State private var searchRoute: SearchRoute?
     let onSelectTab: (AppTab) -> Void
     let makeMentorDetailViewModel: (String) -> MentorDetailViewModel
+    let makeSearchViewModel: (String) -> SearchViewModel
     let onLoadingStateChanged: (Bool) -> Void
 
-    init(viewModel: HomeViewModel, onSelectTab: @escaping (AppTab) -> Void = { _ in }, makeMentorDetailViewModel: @escaping (String) -> MentorDetailViewModel, onLoadingStateChanged: @escaping (Bool) -> Void = { _ in }) {
+    init(viewModel: HomeViewModel, onSelectTab: @escaping (AppTab) -> Void = { _ in }, makeMentorDetailViewModel: @escaping (String) -> MentorDetailViewModel, makeSearchViewModel: @escaping (String) -> SearchViewModel, onLoadingStateChanged: @escaping (Bool) -> Void = { _ in }) {
         _viewModel = State(initialValue: viewModel)
         self.onSelectTab = onSelectTab
         self.makeMentorDetailViewModel = makeMentorDetailViewModel
+        self.makeSearchViewModel = makeSearchViewModel
         self.onLoadingStateChanged = onLoadingStateChanged
     }
 
@@ -66,6 +69,11 @@ struct HomeView: View {
                 HeroSection(
                     slides: dashboard.heroes,
                     searchText: $viewModel.searchText,
+                    onSeek: openSearch,
+                    onPromptTap: { prompt in
+                        viewModel.searchText = prompt
+                        openSearch()
+                    },
                     onOpenPanchang: {
                         selectedPanchang = dashboard.panchang
                         isPanchangPresented = true
@@ -136,6 +144,15 @@ struct HomeView: View {
         .navigationDestination(isPresented: $isPanchangPresented) {
             PanchangView(panchang: selectedPanchang)
         }
+        .navigationDestination(item: $searchRoute) { route in
+            SearchResultsView(viewModel: makeSearchViewModel(route.query))
+        }
+    }
+
+    private func openSearch() {
+        let query = viewModel.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return }
+        searchRoute = SearchRoute(query: query)
     }
 
     private func mentor(from item: HomeCatalogItem) -> Mentor? {
@@ -238,4 +255,9 @@ struct HomeView: View {
                 .offset(x: -150, y: 560)
         }
     }
+}
+
+private struct SearchRoute: Hashable, Identifiable {
+    let query: String
+    var id: String { query }
 }

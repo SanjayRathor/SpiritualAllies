@@ -41,6 +41,13 @@ final class AppDependencies {
         return HomeViewModel(fetchDashboard: useCase)
     }
 
+    func makeSearchViewModel(initialQuery: String) -> SearchViewModel {
+        let dataSource = APISearchRemoteDataSource(client: apiClient)
+        let repository = SearchRepositoryImpl(remoteDataSource: dataSource)
+        let useCase = DefaultSearchSpiritualContentUseCase(repository: repository)
+        return SearchViewModel(initialQuery: initialQuery, searchContent: useCase)
+    }
+
     // MARK: - Places
 
     private func makePlacesRemoteDataSource() -> PlacesRemoteDataSource {
