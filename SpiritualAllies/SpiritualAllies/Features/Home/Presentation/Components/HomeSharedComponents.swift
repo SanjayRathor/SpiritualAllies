@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 /// Shared elevated section container used across the redesigned home screen.
 struct SectionSurface<Content: View>: View {
@@ -91,7 +92,9 @@ struct SectionHeader: View {
                 .font(AppFont.heading(24))
                 .foregroundStyle(AppColor.textPrimary)
             Spacer()
-            if let actionTitle, let action {
+            if let actionTitle,
+               !actionTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+               let action {
                 Button(actionTitle, action: action)
                     .font(AppFont.caption(14))
                     .foregroundStyle(AppColor.primaryDark)

@@ -98,11 +98,13 @@ struct CatalogCard: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(AppColor.textSecondary)
                     .labelStyle(.titleAndIcon)
-                    .lineLimit(1)
+                    .lineLimit(hasTrailingMetadata ? 1 : 3)
                     .truncationMode(.tail)
-                    .frame(maxWidth: 112, alignment: .leading)
+                    .frame(maxWidth: hasTrailingMetadata ? 112 : .infinity, alignment: .leading)
 
-                Spacer(minLength: 8)
+                if hasTrailingMetadata {
+                    Spacer(minLength: 8)
+                }
 
                 if let price = item.priceLabel {
                     Text(price)
@@ -133,6 +135,10 @@ struct CatalogCard: View {
                 .stroke(AppColor.cardStroke.opacity(0.9), lineWidth: 1)
         )
         .shadow(color: AppColor.shadow.opacity(0.14), radius: 20, x: 0, y: 10)
+    }
+
+    private var hasTrailingMetadata: Bool {
+        item.priceLabel != nil || item.rating != nil
     }
 }
 

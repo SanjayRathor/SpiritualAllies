@@ -66,7 +66,7 @@ enum HomeDTOMapper {
                     HomeOSTile(id: $0.id, title: $0.title ?? "", subtitle: $0.subtitle ?? $0.content ?? "", icon: $0.icon, imagePath: $0.image?.displayUrl, route: $0.uri ?? "", displayOrder: $0.displayOrder)
                 }
             ),
-            intentions: landingPicks(intentions, actionLabel: intentions?.chips?.first ?? "Explore"),
+            intentions: landingIntentionPicks(intentions),
             howItWorks: landingPicks(steps, actionLabel: ""),
             sacredPicks: landingPicks(featured.first { $0.id == "offerings" }, actionLabel: "Browse offerings"),
             sacredEvents: landingPicks(featured.first { $0.id.contains("event") }, actionLabel: "Browse events"),
@@ -116,6 +116,28 @@ enum HomeDTOMapper {
                     category: $0.label ?? $0.subtitle ?? "",
                     priceLabel: ($0.value?.contains("★") == true) ? nil : $0.value,
                     rating: rating(from: $0.value),
+                    verified: false,
+                    imagePath: $0.image?.displayUrl ?? section.image?.displayUrl,
+                    route: $0.uri ?? section.uri ?? ""
+                )
+            }
+        )
+    }
+
+    private static func landingIntentionPicks(_ section: LandingSectionDTO?) -> HomeSacredPicks {
+        guard let section else { return emptyPicks }
+        return HomeSacredPicks(
+            eyebrow: section.subtitle ?? "",
+            title: section.title ?? "",
+            subtitle: section.content ?? "",
+            seeAllLabel: "",
+            items: (section.items ?? []).sorted { $0.displayOrder < $1.displayOrder }.map {
+                HomeCatalogItem(
+                    title: $0.title ?? "",
+                    location: $0.subtitle ?? $0.content ?? "",
+                    category: $0.chips?.first ?? $0.title ?? "Intention",
+                    priceLabel: nil,
+                    rating: nil,
                     verified: false,
                     imagePath: $0.image?.displayUrl ?? section.image?.displayUrl,
                     route: $0.uri ?? section.uri ?? ""

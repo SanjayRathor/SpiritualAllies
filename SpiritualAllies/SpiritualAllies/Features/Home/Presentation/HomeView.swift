@@ -13,6 +13,9 @@ struct HomeView: View {
     @State private var selectedPanchang: HomePanchang?
     @State private var isPanchangPresented = false
     @State private var searchRoute: SearchRoute?
+    @State private var selectedSacredFeature: HomeOSTile?
+    @State private var selectedIntention: HomeCatalogItem?
+    @State private var selectedJourneyStep: HomeCatalogItem?
     let onSelectTab: (AppTab) -> Void
     let makeMentorDetailViewModel: (String) -> MentorDetailViewModel
     let makeSearchViewModel: (String) -> SearchViewModel
@@ -85,16 +88,24 @@ struct HomeView: View {
                     OSTilesSection(section: dashboard.osSection) { tile in
                         if let tab = tab(for: tile) {
                             onSelectTab(tab)
+                        } else {
+                            selectedSacredFeature = tile
                         }
                     }
                 }
 
                 if !dashboard.intentions.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.intentions)
+                    SacredPicksSection(
+                        picks: dashboard.intentions,
+                        onTapItem: { selectedIntention = $0 }
+                    )
                 }
 
                 if !dashboard.howItWorks.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.howItWorks)
+                    SacredPicksSection(
+                        picks: dashboard.howItWorks,
+                        onTapItem: { selectedJourneyStep = $0 }
+                    )
                 }
 
                 if !dashboard.sacredPicks.items.isEmpty {
@@ -143,6 +154,23 @@ struct HomeView: View {
         }
         .navigationDestination(item: $searchRoute) { route in
             SearchResultsView(viewModel: makeSearchViewModel(route.query))
+        }
+        .navigationDestination(item: $selectedSacredFeature) { feature in
+            SacredFeatureDetailView(feature: feature) {
+                onSelectTab(.offering)
+            }
+        }
+        .navigationDestination(item: $selectedIntention) { intention in
+            IntentionDetailView(
+                intention: intention,
+                makeSearchViewModel: makeSearchViewModel
+            )
+        }
+        .navigationDestination(item: $selectedJourneyStep) { step in
+            SpiritualStepDetailView(
+                step: step,
+                makeSearchViewModel: makeSearchViewModel
+            )
         }
     }
 
@@ -217,7 +245,11 @@ struct HomeView: View {
     private func tab(for tile: HomeOSTile) -> AppTab? {
         let destination = "\(tile.route) \(tile.title)".lowercased()
         if destination.contains("mentor") || destination.contains("guru") { return .mentors }
-        if destination.contains("event") || destination.contains("pilgrim") || destination.contains("retreat") {
+        if destination.contains("event")
+            || destination.contains("pilgrim")
+            || destination.contains("retreat")
+            || destination.contains("experience")
+            || destination.contains("journey") {
             return nil
         }
         if destination.contains("place") {

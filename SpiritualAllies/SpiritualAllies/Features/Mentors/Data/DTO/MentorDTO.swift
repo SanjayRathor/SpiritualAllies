@@ -7,9 +7,21 @@ struct MentorResponseDTO: Decodable {
         let container = try decoder.container(keyedBy: MentorCodingKey.self)
         let directCatalog = try? container.decodeIfPresent(MentorCatalogDTO.self, forKey: .catalog)
         let nested = try? container.decodeIfPresent(MentorEnvelopeDTO.self, forKey: .data)
+        let pagination = try? container.decodeIfPresent(MentorPaginationDTO.self, forKey: .pagination)
         let catalog = directCatalog ?? nested?.catalog
         let session = (try? container.decodeIfPresent(MentorSessionDTO.self, forKey: .session)) ?? nested?.session
-        let page = catalog?.featured ?? catalog?.items ?? MentorPageDTO(content: [], page: 0, totalElements: nil, totalPages: nil, last: true)
+        let page = catalog?.featured
+            ?? catalog?.items
+            ?? nested?.items.map {
+                MentorPageDTO(
+                    content: $0,
+                    page: pagination?.page,
+                    totalElements: pagination?.totalElements,
+                    totalPages: pagination?.totalPages,
+                    last: pagination?.hasNext.map { !$0 }
+                )
+            }
+            ?? MentorPageDTO(content: [], page: 0, totalElements: nil, totalPages: nil, last: true)
         section = MentorSectionDTO(session: session, page: page)
     }
 }
@@ -102,6 +114,14 @@ struct MentorDetailPayloadDTO: Decodable {
 private struct MentorEnvelopeDTO: Decodable {
     let catalog: MentorCatalogDTO?
     let session: MentorSessionDTO?
+    let items: [MentorItemDTO]?
+}
+
+private struct MentorPaginationDTO: Decodable {
+    let page: Int?
+    let totalElements: Int?
+    let totalPages: Int?
+    let hasNext: Bool?
 }
 
 struct MentorCatalogDTO: Decodable {
@@ -198,14 +218,14 @@ struct MentorItemDTO: Decodable {
         location = container.decodeString(for: [.location, .address, .city, .destination])
         lineage = container.decodeString(for: [.lineage, .spiritualLineage, .tradition, .practice])
         experience = container.decodeString(for: [.experience, .yearsExperience, .years, .experienceYears])
-        languages = container.decodeString(for: [.languages, .language, .spokenLanguages])
-        category = container.decodeString(for: [.category, .categoryName, .type, .specialization])
-        tags = container.decodeStringArray(for: [.categories, .specializations, .expertise, .focusAreas, .practices, .tags])
+        languages = container.decodeString(for: [.languages, .language, .spokenLanguages, .languagesSpoken])
+        category = container.decodeString(for: [.category, .categoryName, .type, .specialization, .mentorType])
+        tags = container.decodeStringArray(for: [.categories, .specializations, .expertise, .areasOfExpertise, .focusAreas, .practices, .tags])
         fee = container.decodeDouble(for: [.fee, .sessionFee, .amount, .price])
-        currency = container.decodeString(for: [.currency, .currencyCode, .feeCurrency])
-        rating = container.decodeDouble(for: [.rating, .averageRating, .avgRating, .score])
-        reviewCount = container.decodeInt(for: [.reviewCount, .reviews, .ratingsCount])
-        imagePath = container.decodeImagePath(for: [.image, .imageUrl, .profilePhotoUrl, .photoUrl, .thumbnailUrl, .gallery])
+        currency = container.decodeString(for: [.currency, .currencyCode, .feeCurrency, .sessionCurrencyCode])
+        rating = container.decodeDouble(for: [.rating, .averageRating, .avgRating, .ratingAvg, .score])
+        reviewCount = container.decodeInt(for: [.reviewCount, .reviews, .ratingsCount, .ratingCount, .totalReviews])
+        imagePath = container.decodeImagePath(for: [.media, .image, .imageUrl, .profilePhotoUrl, .photoUrl, .thumbnailUrl, .gallery])
         verified = container.decodeBool(for: [.verified, .isVerified])
             ?? ((container.decodeString(for: [.verificationStatus, .status]) ?? "").lowercased() == "verified")
     }
@@ -213,29 +233,35 @@ struct MentorItemDTO: Decodable {
 
 enum MentorCodingKey: String, CodingKey {
     case data, guru, catalog, featured, items, content, mentors, results, session, eyebrow, label, title, heading, subtitle, description
-    case heroImage, image, backgroundImage, categories, filters, page, pageNumber, number, numberOfElements, totalElements, total, count, totalPages, pages, last, isLast
+    case pagination, hasNext, heroImage, image, media, backgroundImage, categories, filters, page, pageNumber, number, numberOfElements, totalElements, total, count, totalPages, pages, last, isLast
     case id, mentorId, guruId, uuid, name, fullName, spiritualName, mentorName, displayName, location, address, city, destination
     case lineage, spiritualLineage, tradition, practice, experience, yearsExperience, years, experienceYears, headline, tagline
-    case languages, language, spokenLanguages, category, categoryName, type, specialization, specializations, expertise, focusAreas, practices, tags, teachingFocus
-    case fee, sessionFee, amount, price, currency, currencyCode, feeCurrency
-    case rating, averageRating, avgRating, score, reviewCount, reviews, ratingsCount, students, studentCount, since, memberSince, joinedSince
+    case languages, language, spokenLanguages, languagesSpoken, category, categoryName, type, mentorType, specialization, specializations, expertise, areasOfExpertise, focusAreas, practices, tags, teachingFocus
+    case fee, sessionFee, amount, price, currency, currencyCode, feeCurrency, sessionCurrencyCode
+    case rating, averageRating, avgRating, ratingAvg, score, reviewCount, reviews, ratingsCount, ratingCount, totalReviews, students, studentCount, since, memberSince, joinedSince
     case imageUrl, profilePhotoUrl, photoUrl, thumbnailUrl, gallery, verified, isVerified, verificationStatus, status, isFeatured
     case about, bio, catalogLive, publishedOfferings, offeringsCount, posts, publishedPosts, postsCount, trust, trustScore, followers, followerCount, retreats, retreatsCount
 }
 
 struct MentorImageDTO: Decodable {
+    let thumbnailUrl: String?
     let imageUrl: String?
     let url: String?
     let path: String?
     let src: String?
 
-    var resolvedPath: String? { imageUrl ?? url ?? path ?? src }
+    var resolvedPath: String? { thumbnailUrl ?? imageUrl ?? url ?? path ?? src }
 }
 
 private extension KeyedDecodingContainer where Key == MentorCodingKey {
     func decodeString(for keys: [Key]) -> String? {
         for key in keys {
             if let value = try? decodeIfPresent(String.self, forKey: key), !value.isEmpty { return value }
+            if let values = try? decodeIfPresent([String].self, forKey: key), !values.isEmpty {
+                return values.joined(separator: ", ")
+            }
+            if let value = try? decodeIfPresent(Int.self, forKey: key) { return String(value) }
+            if let value = try? decodeIfPresent(Double.self, forKey: key) { return String(Int(value)) }
         }
         return nil
     }
@@ -266,6 +292,9 @@ private extension KeyedDecodingContainer where Key == MentorCodingKey {
     func decodeStringArray(for keys: [Key]) -> [String] {
         for key in keys {
             if let value = try? decodeIfPresent([String].self, forKey: key) { return value }
+            if let value = try? decodeIfPresent(String.self, forKey: key) {
+                return value.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+            }
         }
         return []
     }

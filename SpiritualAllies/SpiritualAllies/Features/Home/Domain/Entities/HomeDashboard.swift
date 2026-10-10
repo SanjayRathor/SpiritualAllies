@@ -71,7 +71,7 @@ struct HomeOSSection: Equatable {
     let tiles: [HomeOSTile]
 }
 
-struct HomeOSTile: Equatable, Identifiable {
+struct HomeOSTile: Hashable, Identifiable {
     let id: String
     let title: String
     let subtitle: String
@@ -90,7 +90,7 @@ struct HomeSacredPicks: Equatable {
 }
 
 /// A generic bookable catalog card (offering / retreat / event / place).
-struct HomeCatalogItem: Equatable, Identifiable {
+struct HomeCatalogItem: Hashable, Identifiable {
     let title: String
     let location: String
     let category: String
