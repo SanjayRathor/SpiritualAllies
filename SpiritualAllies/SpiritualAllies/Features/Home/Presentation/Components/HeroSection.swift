@@ -96,14 +96,14 @@ struct HeroSection: View {
 
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text(slide.title)
-                            .font(AppFont.title(28))
+                            .font(AppFont.pageTitle())
                             .foregroundStyle(AppColor.onDark)
                             .shadow(color: .black.opacity(0.75), radius: 5, x: 0, y: 2)
                             .lineLimit(3)
                             .fixedSize(horizontal: false, vertical: true)
 
                         Text(slide.subtitle)
-                            .font(AppFont.body(15))
+                            .font(AppFont.body())
                             .foregroundStyle(AppColor.onDarkSecondary)
                             .shadow(color: .black.opacity(0.8), radius: 4, x: 0, y: 2)
                             .lineLimit(3)
@@ -132,7 +132,7 @@ struct HeroSection: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(slide.brandName.isEmpty ? "SpiritualAllies" : slide.brandName)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(AppFont.heading())
                     .foregroundStyle(AppColor.onDark)
                     .shadow(color: .black.opacity(0.65), radius: 3, x: 0, y: 1)
                 Text(slide.tagline.isEmpty ? "TRANSFORM · HEAL · AWAKEN" : slide.tagline.uppercased())
@@ -175,7 +175,7 @@ struct HeroSection: View {
             TextField("", text: $searchText, prompt:
                 Text(placeholder).foregroundStyle(AppColor.textSecondary)
             )
-            .font(AppFont.body(16))
+            .font(AppFont.body())
             .foregroundStyle(AppColor.textPrimary)
             .submitLabel(.search)
             .onSubmit(onSeek)

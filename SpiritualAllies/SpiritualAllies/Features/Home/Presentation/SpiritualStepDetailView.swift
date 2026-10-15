@@ -50,14 +50,14 @@ struct SpiritualStepDetailView: View {
                         .background(Capsule().fill(AppColor.accentSoft))
 
                     Text(step.title)
-                        .font(.system(size: 38, weight: .bold, design: .serif))
+                        .font(AppFont.heroTitle())
                         .foregroundStyle(.white)
                         .lineLimit(3)
                         .minimumScaleFactor(0.78)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     Text(step.location)
-                        .font(AppFont.body(17))
+                        .font(AppFont.body())
                         .foregroundStyle(.white.opacity(0.86))
                         .lineLimit(4)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -74,11 +74,11 @@ struct SpiritualStepDetailView: View {
     private var meaningCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             Label(sectionTitle, systemImage: stepIcon)
-                .font(AppFont.title(23))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(AppColor.textPrimary)
 
             Text(stepMeaning)
-                .font(AppFont.body(16))
+                .font(AppFont.body(AppFontSize.bodySmall))
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(5)
                 .fixedSize(horizontal: false, vertical: true)
@@ -92,7 +92,7 @@ struct SpiritualStepDetailView: View {
     private var guidanceCard: some View {
         VStack(alignment: .leading, spacing: 15) {
             Text("What this means for you")
-                .font(AppFont.title(22))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(AppColor.textPrimary)
 
             ForEach(guidance, id: \.title) { item in
@@ -124,7 +124,7 @@ struct SpiritualStepDetailView: View {
     private var continueCard: some View {
         VStack(alignment: .leading, spacing: 13) {
             Text("Begin with your intention")
-                .font(AppFont.title(23))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(.white)
 
             Text("Tell AI Seek what is calling you today. It will explore trusted offerings, places, and guides across SpiritualAllies.")
@@ -136,7 +136,7 @@ struct SpiritualStepDetailView: View {
                 SearchResultsView(viewModel: makeSearchViewModel(searchPrompt))
             } label: {
                 Label("Open AI Seek", systemImage: "sparkles")
-                    .font(AppFont.heading(16))
+                    .font(AppFont.button())
                     .foregroundStyle(AppColor.primaryDark)
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)

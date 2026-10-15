@@ -39,7 +39,7 @@ struct TagChip: View {
 
     var body: some View {
         Text(text)
-            .font(.system(size: 16, weight: .semibold))
+            .font(AppFont.button())
             .foregroundStyle(AppColor.primaryDark.opacity(0.92))
         .padding(.horizontal, 24)
         .padding(.vertical, 14)
@@ -89,14 +89,14 @@ struct SectionHeader: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
-                .font(AppFont.heading(24))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(AppColor.textPrimary)
             Spacer()
             if let actionTitle,
                !actionTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                let action {
                 Button(actionTitle, action: action)
-                    .font(AppFont.caption(14))
+                    .font(AppFont.button())
                     .foregroundStyle(AppColor.primaryDark)
                     .padding(.horizontal, AppSpacing.md)
                     .padding(.vertical, AppSpacing.sm)

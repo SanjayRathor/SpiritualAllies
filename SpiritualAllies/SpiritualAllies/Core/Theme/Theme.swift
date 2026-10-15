@@ -56,10 +56,36 @@ enum AppRadius {
     static let lg: CGFloat = 24
 }
 
+/// The app's single source of truth for type sizes.
+final class AppFontSize {
+    private init() {}
+
+    static let heroTitle: CGFloat = 30
+    static let pageTitle: CGFloat = 26
+    static let sectionTitle: CGFloat = 21
+    static let cardTitle: CGFloat = 17
+    static let heading: CGFloat = 16
+    static let body: CGFloat = 15
+    static let bodySmall: CGFloat = 14
+    static let button: CGFloat = 14
+    static let label: CGFloat = 13
+    static let caption: CGFloat = 12
+    static let eyebrow: CGFloat = 11
+}
+
 enum AppFont {
-    static func title(_ size: CGFloat = 28) -> Font { .system(size: size, weight: .bold, design: .serif) }
-    static func heading(_ size: CGFloat = 20) -> Font { .system(size: size, weight: .semibold) }
-    static func body(_ size: CGFloat = 15) -> Font { .system(size: size, weight: .regular) }
-    static func caption(_ size: CGFloat = 12) -> Font { .system(size: size, weight: .medium) }
-    static func eyebrow(_ size: CGFloat = 11) -> Font { .system(size: size, weight: .semibold) }
+    static func heroTitle() -> Font { .system(size: AppFontSize.heroTitle, weight: .bold, design: .serif) }
+    static func pageTitle() -> Font { .system(size: AppFontSize.pageTitle, weight: .bold, design: .serif) }
+    static func sectionTitle() -> Font { .system(size: AppFontSize.sectionTitle, weight: .bold, design: .serif) }
+    static func cardTitle() -> Font { .system(size: AppFontSize.cardTitle, weight: .bold, design: .serif) }
+    static func button() -> Font { .system(size: AppFontSize.button, weight: .semibold) }
+    static func label() -> Font { .system(size: AppFontSize.label, weight: .medium) }
+    static func bodySmall() -> Font { .system(size: AppFontSize.bodySmall, weight: .regular) }
+
+    // Sized overloads remain for exceptional layouts and older call sites.
+    static func title(_ size: CGFloat = AppFontSize.pageTitle) -> Font { .system(size: size, weight: .bold, design: .serif) }
+    static func heading(_ size: CGFloat = AppFontSize.heading) -> Font { .system(size: size, weight: .semibold) }
+    static func body(_ size: CGFloat = AppFontSize.body) -> Font { .system(size: size, weight: .regular) }
+    static func caption(_ size: CGFloat = AppFontSize.caption) -> Font { .system(size: size, weight: .medium) }
+    static func eyebrow(_ size: CGFloat = AppFontSize.eyebrow) -> Font { .system(size: size, weight: .semibold) }
 }

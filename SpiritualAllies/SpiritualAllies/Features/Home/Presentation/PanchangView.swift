@@ -51,7 +51,7 @@ struct PanchangView: View {
                 ForEach(PanchangSection.allCases) { section in
                     Button { selectedSection = section } label: {
                         Label(section.rawValue, systemImage: section.icon)
-                            .font(AppFont.heading(14))
+                            .font(AppFont.button())
                             .foregroundStyle(selectedSection == section ? AppColor.onDark : AppColor.textSecondary)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 11)
@@ -96,8 +96,8 @@ struct PanchangView: View {
 
     private func timingCard(title: String, subtitle: String, icon: String) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Label(title, systemImage: icon).font(AppFont.title(25)).foregroundStyle(AppColor.textPrimary)
-            Text(subtitle).font(AppFont.body(16)).foregroundStyle(AppColor.textSecondary)
+            Label(title, systemImage: icon).font(AppFont.sectionTitle()).foregroundStyle(AppColor.textPrimary)
+            Text(subtitle).font(AppFont.body()).foregroundStyle(AppColor.textSecondary)
             VStack(spacing: 0) {
                 timingRow("Brahma Muhurta", "04:28 AM - 06:04 AM")
                 timingRow("Abhijit Muhurat", "11:47 AM - 12:36 PM", accent: true)
@@ -105,14 +105,15 @@ struct PanchangView: View {
             }
         }
         .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground())
     }
 
     private func timingRow(_ title: String, _ time: String, accent: Bool = false) -> some View {
         HStack {
-            Text(title).font(AppFont.body(16)).foregroundStyle(accent ? AppColor.primary : AppColor.textPrimary)
+            Text(title).font(AppFont.body()).foregroundStyle(accent ? AppColor.primary : AppColor.textPrimary)
             Spacer()
-            Text(time).font(AppFont.body(14)).foregroundStyle(accent ? AppColor.primary : AppColor.textSecondary)
+            Text(time).font(AppFont.bodySmall()).foregroundStyle(accent ? AppColor.primary : AppColor.textSecondary)
         }
         .padding(.vertical, 15)
         .overlay(alignment: .bottom) { Divider() }
@@ -120,18 +121,19 @@ struct PanchangView: View {
 
     private func detailCard(title: String, subtitle: String, icon: String) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label(title, systemImage: icon).font(AppFont.title(25)).foregroundStyle(AppColor.textPrimary)
-            Text(subtitle).font(AppFont.body(16)).foregroundStyle(AppColor.textSecondary).lineSpacing(4)
+            Label(title, systemImage: icon).font(AppFont.sectionTitle()).foregroundStyle(AppColor.textPrimary)
+            Text(subtitle).font(AppFont.body()).foregroundStyle(AppColor.textSecondary).lineSpacing(4)
         }
         .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground())
     }
 
     private func emptySection(title: String, subtitle: String, icon: String) -> some View {
         VStack(spacing: 14) {
             Image(systemName: icon).font(.system(size: 28)).foregroundStyle(AppColor.primary)
-            Text(title).font(AppFont.title(25)).foregroundStyle(AppColor.textPrimary)
-            Text(subtitle).font(AppFont.body(16)).foregroundStyle(AppColor.textSecondary).multilineTextAlignment(.center)
+            Text(title).font(AppFont.sectionTitle()).foregroundStyle(AppColor.textPrimary)
+            Text(subtitle).font(AppFont.body()).foregroundStyle(AppColor.textSecondary).multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
         .padding(34)
@@ -145,10 +147,10 @@ struct PanchangView: View {
                 .tracking(3)
                 .foregroundStyle(AppColor.accent)
             Text("Today's Panchang")
-                .font(AppFont.title(32))
+                .font(AppFont.pageTitle())
                 .foregroundStyle(AppColor.textPrimary)
             Text(panchang?.subtitle ?? "Tithi, nakshatra, muhurats, and auspicious timings for your day.")
-                .font(AppFont.body(17))
+                .font(AppFont.body())
                 .foregroundStyle(AppColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -159,9 +161,9 @@ struct PanchangView: View {
 
     private var daySummary: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Day Summary").font(AppFont.title(24)).foregroundStyle(AppColor.textPrimary)
+            Text("Day Summary").font(AppFont.sectionTitle()).foregroundStyle(AppColor.textPrimary)
             Label("Auspicious", systemImage: "checkmark")
-                .font(AppFont.heading(15))
+                .font(AppFont.label())
                 .foregroundStyle(AppColor.primary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 9)
@@ -173,18 +175,19 @@ struct PanchangView: View {
             }
         }
         .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground())
     }
 
     private func limbs(_ pillars: [HomePanchangPillar]) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Today's details").font(AppFont.title(24)).foregroundStyle(AppColor.textPrimary)
+            Text("Today's details").font(AppFont.sectionTitle()).foregroundStyle(AppColor.textPrimary)
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 ForEach(pillars) { pillar in
                     VStack(alignment: .leading, spacing: 7) {
                         Text(pillar.label.uppercased()).font(AppFont.eyebrow(10)).tracking(1).foregroundStyle(AppColor.textSecondary)
-                        Text(pillar.name).font(AppFont.heading(16)).foregroundStyle(AppColor.textPrimary)
-                        if !pillar.detail.isEmpty { Text(pillar.detail).font(AppFont.body(13)).foregroundStyle(AppColor.textSecondary).lineLimit(2) }
+                        Text(pillar.name).font(AppFont.heading()).foregroundStyle(AppColor.textPrimary)
+                        if !pillar.detail.isEmpty { Text(pillar.detail).font(AppFont.label()).foregroundStyle(AppColor.textSecondary).lineLimit(2) }
                     }
                     .frame(maxWidth: .infinity, minHeight: 92, alignment: .leading)
                     .padding(14)
@@ -193,15 +196,16 @@ struct PanchangView: View {
             }
         }
         .padding(22)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(cardBackground())
     }
 
     private var comingSoon: some View {
         VStack(alignment: .leading, spacing: 8) {
             Label("More Panchang details", systemImage: "sparkles")
-                .font(AppFont.heading(18)).foregroundStyle(AppColor.primary)
+                .font(AppFont.cardTitle()).foregroundStyle(AppColor.primary)
             Text("Muhurat, Rahu Kaal, festivals, and Ekadashi will appear here as their dedicated data sections are connected.")
-                .font(AppFont.body(15)).foregroundStyle(AppColor.textSecondary)
+                .font(AppFont.body()).foregroundStyle(AppColor.textSecondary)
         }
         .padding(22)
         .background(cardBackground())
@@ -209,7 +213,7 @@ struct PanchangView: View {
 
     private func summaryRow(_ title: String) -> some View {
         Label(title, systemImage: "star.fill")
-            .font(AppFont.body(16))
+            .font(AppFont.body())
             .foregroundStyle(AppColor.textPrimary)
     }
 

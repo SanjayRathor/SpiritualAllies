@@ -54,14 +54,14 @@ struct SacredFeatureDetailView: View {
                         )
 
                     Text(feature.title)
-                        .font(.system(size: 39, weight: .bold, design: .serif))
+                        .font(AppFont.heroTitle())
                         .foregroundStyle(.white)
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     Text(feature.subtitle)
-                        .font(AppFont.body(18))
+                        .font(AppFont.body())
                         .foregroundStyle(.white.opacity(0.86))
                         .lineLimit(3)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -87,13 +87,13 @@ struct SacredFeatureDetailView: View {
             }
 
             Text(messageTitle)
-                .font(AppFont.title(25))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(AppColor.textPrimary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(messageBody)
-                .font(AppFont.body(16))
+                .font(AppFont.body(AppFontSize.bodySmall))
                 .foregroundStyle(AppColor.textSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(5)
@@ -101,7 +101,7 @@ struct SacredFeatureDetailView: View {
 
             Button(action: onExploreOfferings) {
                 Label("Explore Sacred Offerings", systemImage: "hands.sparkles")
-                    .font(AppFont.heading(15))
+                    .font(AppFont.button())
                     .foregroundStyle(AppColor.primaryDark)
                     .padding(.horizontal, 20)
                     .frame(height: 50)
@@ -127,7 +127,7 @@ struct SacredFeatureDetailView: View {
     private var whatToExpect: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("What you’ll discover here")
-                .font(AppFont.title(22))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(AppColor.textPrimary)
 
             ForEach(expectations, id: \.title) { item in

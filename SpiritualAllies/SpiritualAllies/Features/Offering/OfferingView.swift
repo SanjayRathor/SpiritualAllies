@@ -95,7 +95,7 @@ struct OfferingView: View {
                         withAnimation(.easeInOut(duration: 0.2)) { viewModel.selectedCategory = category }
                     } label: {
                         Text(category)
-                            .font(AppFont.heading(15))
+                            .font(AppFont.button())
                             .foregroundStyle(viewModel.selectedCategory == category ? AppColor.onDark : AppColor.primary)
                             .lineLimit(1)
                             .fixedSize(horizontal: true, vertical: false)
@@ -113,7 +113,7 @@ struct OfferingView: View {
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("No offerings found")
-                .font(AppFont.title(23))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(AppColor.textPrimary)
             Text("Try another category or search term.")
                 .font(AppFont.body(15))
@@ -157,7 +157,7 @@ private struct SearchField: View {
                 .font(.system(size: 20, weight: .medium))
                 .foregroundStyle(AppColor.textSecondary)
             TextField("Search by name, temple, mentor, or ritual...", text: $text)
-                .font(AppFont.body(16))
+                .font(AppFont.body())
                 .foregroundStyle(AppColor.textPrimary)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
@@ -221,15 +221,15 @@ private struct OfferingHero: View {
                 Spacer(minLength: 0)
 
                 Text("\(section.totalCount ?? 0) OFFERINGS • PAN-INDIA")
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .font(.system(size: AppFontSize.caption, weight: .bold, design: .monospaced))
                     .tracking(2.6)
                     .foregroundStyle(AppColor.accentSoft)
                 Text(section.title)
-                    .font(.system(size: 36, weight: .bold, design: .serif))
+                    .font(AppFont.heroTitle())
                     .foregroundStyle(.white)
                     .shadow(color: .black.opacity(0.45), radius: 5, x: 0, y: 2)
                 Text(section.subtitle)
-                    .font(.system(size: 19, weight: .medium))
+                    .font(AppFont.body())
                     .foregroundStyle(.white.opacity(0.9))
                     .lineSpacing(4)
                     .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
@@ -256,7 +256,7 @@ private struct OfferingRowCard: View {
             VStack(alignment: .leading, spacing: 7) {
                 HStack(alignment: .top, spacing: 8) {
                     Text(offering.title)
-                        .font(.system(size: 18, weight: .bold, design: .serif))
+                        .font(AppFont.cardTitle())
                         .foregroundStyle(AppColor.textPrimary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
@@ -270,13 +270,13 @@ private struct OfferingRowCard: View {
 
                 if !offering.location.isEmpty {
                     Text(offering.location)
-                        .font(AppFont.body(15))
+                        .font(AppFont.body())
                         .foregroundStyle(AppColor.textSecondary)
                         .lineLimit(1)
                 }
                 if !offering.details.isEmpty {
                     Text(offering.details)
-                        .font(AppFont.body(14))
+                        .font(AppFont.body(AppFontSize.bodySmall))
                         .foregroundStyle(AppColor.textSecondary)
                         .lineLimit(1)
                 }
@@ -284,7 +284,7 @@ private struct OfferingRowCard: View {
                 HStack(alignment: .firstTextBaseline) {
                     if let priceLabel = offering.priceLabel {
                         Text(priceLabel)
-                            .font(.system(size: 21, weight: .bold))
+                            .font(.system(size: AppFontSize.sectionTitle, weight: .bold))
                             .foregroundStyle(AppColor.textPrimary)
                     }
                     Spacer(minLength: 4)

@@ -210,15 +210,15 @@ private struct MentorHero: View {
 
                 Spacer(minLength: 0)
                 Text("\(section.totalCount ?? 0) VERIFIED GUIDES")
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .font(.system(size: AppFontSize.caption, weight: .bold, design: .monospaced))
                     .tracking(2.6)
                     .foregroundStyle(AppColor.accentSoft)
                 Text(section.title)
-                    .font(.system(size: 36, weight: .bold, design: .serif))
+                    .font(AppFont.heroTitle())
                     .foregroundStyle(.white)
                     .shadow(color: .black.opacity(0.5), radius: 5, x: 0, y: 2)
                 Text(section.subtitle)
-                    .font(.system(size: 19, weight: .medium))
+                    .font(AppFont.body())
                     .foregroundStyle(.white.opacity(0.9))
                     .lineSpacing(4)
                     .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 2)
@@ -245,7 +245,7 @@ private struct MentorRowCard: View {
             VStack(alignment: .leading, spacing: 7) {
                 HStack(alignment: .top, spacing: 8) {
                     Text(mentor.name)
-                        .font(.system(size: 18, weight: .bold, design: .serif))
+                        .font(AppFont.cardTitle())
                         .foregroundStyle(AppColor.textPrimary)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)

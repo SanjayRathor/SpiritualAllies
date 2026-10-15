@@ -26,7 +26,7 @@ struct SacredPicksSection: View {
 
                 if !picks.subtitle.isEmpty {
                     Text(picks.subtitle)
-                        .font(AppFont.body(15))
+                        .font(AppFont.body())
                         .foregroundStyle(AppColor.textSecondary)
                         .lineLimit(3)
                 }
@@ -70,32 +70,34 @@ struct CatalogCard: View {
                     VerifiedBadge()
                         .padding(12)
                 }
-                Text(item.category.uppercased())
-                    .font(.system(size: 11, weight: .bold))
-                    .tracking(1.0)
-                    .foregroundStyle(AppColor.primaryDark)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.86)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(AppColor.accentSoft)
-                    )
-                    .padding(12)
-                    .frame(width: 156, alignment: .trailing)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                if !categoryLabel.isEmpty {
+                    Text(categoryLabel.uppercased())
+                        .font(.system(size: AppFontSize.eyebrow, weight: .bold))
+                        .tracking(1.0)
+                        .foregroundStyle(AppColor.primaryDark)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.86)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(AppColor.accentSoft)
+                        )
+                        .padding(12)
+                        .frame(width: 156, alignment: .trailing)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
             }
 
             Text(item.title)
-                .font(.system(size: 20, weight: .bold, design: .serif))
+                .font(AppFont.cardTitle())
                 .foregroundStyle(AppColor.textPrimary)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
 
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Label(item.location, systemImage: "mappin.and.ellipse")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(AppFont.label())
                     .foregroundStyle(AppColor.textSecondary)
                     .labelStyle(.titleAndIcon)
                     .lineLimit(hasTrailingMetadata ? 1 : 3)
@@ -108,7 +110,7 @@ struct CatalogCard: View {
 
                 if let price = item.priceLabel {
                     Text(price)
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: AppFontSize.cardTitle, weight: .bold))
                         .foregroundStyle(AppColor.textPrimary)
                 }
 
@@ -118,7 +120,7 @@ struct CatalogCard: View {
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(AppColor.accent)
                         Text(String(format: "%.1f", rating))
-                            .font(.system(size: 16, weight: .medium))
+                            .font(AppFont.label())
                             .foregroundStyle(AppColor.textSecondary)
                     }
                 }
@@ -140,6 +142,10 @@ struct CatalogCard: View {
     private var hasTrailingMetadata: Bool {
         item.priceLabel != nil || item.rating != nil
     }
+
+    private var categoryLabel: String {
+        item.category.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }
 
 struct PanchangSection: View {
@@ -153,7 +159,7 @@ struct PanchangSection: View {
                 .foregroundStyle(AppColor.accent)
 
             Text(panchang.title)
-                .font(AppFont.title(26))
+                .font(AppFont.pageTitle())
                 .foregroundStyle(AppColor.textPrimary)
 
             if !panchang.subtitle.isEmpty {

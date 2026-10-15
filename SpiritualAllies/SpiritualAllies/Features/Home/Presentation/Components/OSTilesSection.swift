@@ -21,12 +21,12 @@ struct OSTilesSection: View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 14) {
                 Text(section.eyebrow.uppercased())
-                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .font(.system(size: AppFontSize.eyebrow, weight: .bold, design: .monospaced))
                     .tracking(4.5)
                     .foregroundStyle(AppColor.textSecondary.opacity(0.9))
 
                 Text(section.title)
-                    .font(.system(size: 22, weight: .bold, design: .serif))
+                    .font(AppFont.sectionTitle())
                     .foregroundStyle(AppColor.textPrimary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
@@ -34,7 +34,7 @@ struct OSTilesSection: View {
 
                 if !section.subtitle.isEmpty {
                     Text(section.subtitle)
-                        .font(AppFont.body(15))
+                        .font(AppFont.body())
                         .foregroundStyle(AppColor.textSecondary)
                         .lineLimit(3)
                         .fixedSize(horizontal: false, vertical: true)
@@ -107,12 +107,12 @@ struct OSTilesSection: View {
 
             VStack(alignment: .leading, spacing: 5) {
                 Text(tile.title)
-                    .font(.system(size: featured ? 20 : 14, weight: .bold, design: .serif))
+                    .font(featured ? AppFont.cardTitle() : AppFont.heading(AppFontSize.bodySmall))
                     .foregroundStyle(AppColor.onDark)
                     .lineLimit(1)
                     .fixedSize(horizontal: false, vertical: false)
                 Text(tile.subtitle)
-                    .font(.system(size: featured ? 18 : 12, weight: .medium))
+                    .font(.system(size: featured ? AppFontSize.bodySmall : AppFontSize.caption, weight: .medium))
                     .foregroundStyle(AppColor.onDarkSecondary)
                     .lineLimit(featured ? 3 : 3)
                     .fixedSize(horizontal: false, vertical: true)

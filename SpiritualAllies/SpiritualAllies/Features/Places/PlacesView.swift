@@ -271,17 +271,17 @@ private struct PlacesHeroView: View {
                 Spacer(minLength: 0)
 
                 Text("\(countText) • VERIFIED")
-                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .font(.system(size: AppFontSize.caption, weight: .bold, design: .monospaced))
                     .tracking(3.2)
                     .foregroundStyle(AppColor.accentSoft)
 
                 Text("Sacred Places")
-                    .font(.system(size: 42, weight: .bold, design: .serif))
+                    .font(AppFont.heroTitle())
                     .foregroundStyle(AppColor.onDark)
                     .lineLimit(1)
 
                 Text("Temples, ghats and ashrams — timings, rituals and how to reach them.")
-                    .font(.system(size: 18, weight: .medium))
+                    .font(AppFont.body())
                     .foregroundStyle(AppColor.onDarkSecondary)
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
@@ -309,18 +309,18 @@ private struct SacredPlaceRowCard: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text(place.title)
-                    .font(.system(size: 18, weight: .bold, design: .serif))
+                    .font(AppFont.cardTitle())
                     .foregroundStyle(AppColor.textPrimary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(place.location)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(AppFont.body())
                     .foregroundStyle(AppColor.textSecondary)
                     .lineLimit(1)
 
                 Text(place.detailsLine.isEmpty ? place.category : place.detailsLine)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(AppFont.body(AppFontSize.bodySmall))
                     .foregroundStyle(AppColor.textSecondary)
                     .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)

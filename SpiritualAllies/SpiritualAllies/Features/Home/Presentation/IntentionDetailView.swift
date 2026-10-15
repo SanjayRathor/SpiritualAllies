@@ -57,13 +57,13 @@ struct IntentionDetailView: View {
                         .foregroundStyle(AppColor.accentSoft)
 
                     Text(intention.title)
-                        .font(.system(size: 40, weight: .bold, design: .serif))
+                        .font(AppFont.heroTitle())
                         .foregroundStyle(.white)
                         .lineLimit(2)
                         .minimumScaleFactor(0.78)
 
                     Text(intention.location)
-                        .font(AppFont.body(18))
+                        .font(AppFont.body())
                         .foregroundStyle(.white.opacity(0.86))
                         .lineLimit(3)
                 }
@@ -79,11 +79,11 @@ struct IntentionDetailView: View {
     private var introduction: some View {
         VStack(alignment: .leading, spacing: 13) {
             Label("A path shaped around you", systemImage: "sparkles")
-                .font(AppFont.title(23))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(AppColor.textPrimary)
 
             Text(intentionMeaning)
-                .font(AppFont.body(16))
+                .font(AppFont.body(AppFontSize.bodySmall))
                 .foregroundStyle(AppColor.textSecondary)
                 .lineSpacing(5)
                 .fixedSize(horizontal: false, vertical: true)
@@ -97,7 +97,7 @@ struct IntentionDetailView: View {
     private var pathsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Paths you may explore")
-                .font(AppFont.title(23))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(AppColor.textPrimary)
 
             ForEach(suggestedPaths, id: \.title) { path in
@@ -110,10 +110,10 @@ struct IntentionDetailView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(path.title)
-                            .font(AppFont.heading(16))
+                            .font(AppFont.heading())
                             .foregroundStyle(AppColor.textPrimary)
                         Text(path.detail)
-                            .font(AppFont.body(14))
+                            .font(AppFont.body(AppFontSize.bodySmall))
                             .foregroundStyle(AppColor.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -129,7 +129,7 @@ struct IntentionDetailView: View {
     private var seekCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             Text("Not sure where to begin?")
-                .font(AppFont.title(24))
+                .font(AppFont.sectionTitle())
                 .foregroundStyle(.white)
 
             Text("AI Seek can explore offerings, sacred places, mentors, and journeys that align with your intention.")
@@ -151,7 +151,7 @@ struct IntentionDetailView: View {
                 SearchResultsView(viewModel: makeSearchViewModel(searchPrompt))
             } label: {
                 Label("Ask AI Seek", systemImage: "sparkles")
-                    .font(AppFont.heading(16))
+                    .font(AppFont.button())
                     .foregroundStyle(AppColor.primaryDark)
                     .frame(maxWidth: .infinity)
                     .frame(height: 52)

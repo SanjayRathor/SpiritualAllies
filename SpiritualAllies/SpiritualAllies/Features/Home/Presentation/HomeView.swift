@@ -137,7 +137,9 @@ struct HomeView: View {
                 }
 
                 if !dashboard.discoveryCTA.title.isEmpty {
-                    DiscoveryCTASection(cta: dashboard.discoveryCTA)
+                    DiscoveryCTASection(cta: dashboard.discoveryCTA) {
+                        searchRoute = SearchRoute(query: "")
+                    }
                 }
             }
                 .frame(maxWidth: .infinity, alignment: .leading)

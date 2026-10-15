@@ -31,7 +31,13 @@ struct SearchResultsView: View {
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
-        case .idle, .loading:
+        case .idle:
+            ContentUnavailableView {
+                Label("What are you seeking?", systemImage: "sparkles")
+            } description: {
+                Text("Search for sacred places, rituals, mentors, offerings, or spiritual guidance in your own words.")
+            }
+        case .loading:
             VStack(spacing: 14) {
                 ProgressView()
                     .controlSize(.large)
