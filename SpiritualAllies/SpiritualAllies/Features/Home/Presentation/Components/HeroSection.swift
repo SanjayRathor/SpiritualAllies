@@ -17,6 +17,14 @@ struct HeroSection: View {
     var onOpenPanchang: () -> Void = {}
 
     @State private var selectedIndex = 0
+    @State private var locationManager = LocationManager()
+    @State private var selectedDate: Date?
+    @State private var isDatePickerPresented = false
+
+    private var dateLabel: String {
+        guard let selectedDate else { return "Any date" }
+        return selectedDate.formatted(.dateTime.day().month(.abbreviated))
+    }
 
     private var topSafeAreaInset: CGFloat {
         UIApplication.shared.connectedScenes
@@ -35,6 +43,55 @@ struct HeroSection: View {
         .task {
             await autoAdvanceLoop()
         }
+        .task {
+            await locationManager.resolveCountry()
+        }
+        .sheet(isPresented: $isDatePickerPresented) {
+            datePickerSheet
+        }
+    }
+
+    private var datePickerSheet: some View {
+        NavigationStack {
+            VStack(spacing: AppSpacing.md) {
+                DatePicker(
+                    "Date",
+                    selection: Binding(
+                        get: { selectedDate ?? Date() },
+                        set: { selectedDate = $0 }
+                    ),
+                    in: Date()...,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.graphical)
+                .tint(AppColor.accent)
+
+                Spacer()
+            }
+            .padding(.horizontal, AppSpacing.md)
+            .background(AppColor.background)
+            .navigationTitle("Choose a date")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Any date") {
+                        selectedDate = nil
+                        isDatePickerPresented = false
+                    }
+                    .foregroundStyle(AppColor.textSecondary)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        if selectedDate == nil { selectedDate = Date() }
+                        isDatePickerPresented = false
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundStyle(AppColor.accent)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 
     private var heroCarousel: some View {
@@ -50,7 +107,7 @@ struct HeroSection: View {
                 searchBar(placeholder: currentSlide?.searchPlaceholder ?? "Search temples, poojas, events...")
                 pageIndicator
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 12)
             .padding(.bottom, 16)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
 
@@ -205,17 +262,29 @@ struct HeroSection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 16)
-            .frame(height: 48)
+            .frame(height: 42)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 HStack(spacing: 0) {
-                    searchFilter(icon: "calendar", title: "Any date")
+                    Button { isDatePickerPresented = true } label: {
+                        searchFilter(icon: "calendar", title: dateLabel)
+                    }
+                    .buttonStyle(.plain)
+
                     Rectangle()
                         .fill(AppColor.cardStroke)
                         .frame(width: 1, height: 24)
-                    searchFilter(icon: "mappin.and.ellipse", title: "India")
+
+                    Button { Task { await locationManager.resolveCountry() } } label: {
+                        searchFilter(
+                            icon: "mappin.and.ellipse",
+                            title: locationManager.displayCountry,
+                            isLoading: locationManager.state == .requesting
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .frame(height: 48)
+                .frame(height: 42)
                 .background(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(Color.white)
@@ -227,25 +296,25 @@ struct HeroSection: View {
 
                 Button(action: onSeek) {
                     Image(systemName: "arrow.right")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.white)
-                        .frame(width: 48, height: 48)
+                        .frame(width: 42, height: 42)
                         .background(Circle().fill(AppColor.accent))
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal, 10)
-            .padding(.bottom, 10)
+            .padding(.horizontal, 8)
+            .padding(.bottom, 8)
         }
-        .padding(.top, 6)
+        .padding(.top, 2)
         .background(
-            RoundedRectangle(cornerRadius: 26, style: .continuous)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(Color.white)
         )
         .shadow(color: AppColor.shadow.opacity(0.16), radius: 16, y: 8)
     }
 
-    private func searchFilter(icon: String, title: String) -> some View {
+    private func searchFilter(icon: String, title: String, isLoading: Bool = false) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 14, weight: .regular))
@@ -255,12 +324,20 @@ struct HeroSection: View {
                 .foregroundStyle(AppColor.textPrimary)
                 .lineLimit(1)
             Spacer(minLength: 4)
-            Image(systemName: "chevron.down")
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(AppColor.textSecondary)
+            if isLoading {
+                ProgressView()
+                    .controlSize(.mini)
+                    .tint(AppColor.textSecondary)
+            } else {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(AppColor.textSecondary)
+            }
         }
         .padding(.horizontal, 14)
         .frame(maxWidth: .infinity)
+        .frame(height: 42)
+        .contentShape(Rectangle())
     }
 
     private func heroPill(_ title: String, icon: String) -> some View {
