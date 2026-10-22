@@ -95,7 +95,7 @@ enum HomeDTOMapper {
                 title: $0.title ?? "",
                 subtitle: $0.content ?? "",
                 heroImagePath: $0.image?.displayUrl ?? section.image?.displayUrl,
-                searchPlaceholder: "Search places, rituals, mentors & retreats",
+                searchPlaceholder: "Search temples, poojas, events...",
                 searchActionLabel: "Seek",
                 prompts: section.chips ?? []
             )
@@ -170,7 +170,7 @@ enum HomeDTOMapper {
             title: title,
             subtitle: dto.desc ?? "Explore a path that meets you where you are.",
             heroImagePath: dto.galleries?.first?.imageUrl,
-            searchPlaceholder: "What is your heart seeking?",
+            searchPlaceholder: "Search temples, poojas, events...",
             searchActionLabel: "Seek",
             prompts: dto.tags ?? []
         )

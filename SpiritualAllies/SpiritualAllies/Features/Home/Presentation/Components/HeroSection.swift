@@ -13,6 +13,7 @@ struct HeroSection: View {
     @Binding var searchText: String
     var onSeek: () -> Void = {}
     var onPromptTap: (String) -> Void = { _ in }
+    var onOpenSearch: () -> Void = {}
     var onOpenPanchang: () -> Void = {}
 
     @State private var selectedIndex = 0
@@ -28,7 +29,7 @@ struct HeroSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             heroCarousel
-                .frame(height: 540)
+                .frame(height: 600)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .task {
@@ -45,20 +46,18 @@ struct HeroSection: View {
                 }
             }
 
-            VStack(spacing: AppSpacing.sm) {
-                // The seek bar stays fixed while the feature content changes.
-                searchBar(placeholder: currentSlide?.searchPlaceholder ?? "What is your heart seeking?", actionLabel: currentSlide?.searchActionLabel ?? "Seek")
-                fixedTags
+            VStack(spacing: 12) {
+                searchBar(placeholder: currentSlide?.searchPlaceholder ?? "Search temples, poojas, events...")
                 pageIndicator
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 20)
+            .padding(.bottom, 16)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
 
             if let firstSlide = slides.first {
                 header(for: firstSlide)
                     .padding(.horizontal, 20)
-                    .padding(.top, topSafeAreaInset + 10)
+                    .padding(.top, topSafeAreaInset + 8)
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
@@ -79,127 +78,205 @@ struct HeroSection: View {
                         .clipped()
 
                     LinearGradient(
-                        colors: [
-                            Color.black.opacity(0.08),
-                            AppColor.primaryDark.opacity(0.05),
-                            AppColor.primaryDark.opacity(0.34),
-                            AppColor.primaryDark.opacity(0.86)
+                        stops: [
+                            .init(color: AppColor.surface.opacity(0.96), location: 0.0),
+                            .init(color: AppColor.surface.opacity(0.82), location: 0.25),
+                            .init(color: AppColor.surface.opacity(0.55), location: 0.50),
+                            .init(color: AppColor.surface.opacity(0.15), location: 0.68),
+                            .init(color: Color.clear, location: 0.80),
+                            .init(color: AppColor.primaryDark.opacity(0.12), location: 1.0)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 }
-                .shadow(color: AppColor.shadow.opacity(0.18), radius: 24, x: 0, y: 14)
 
-                VStack(alignment: .leading, spacing: 0) {
-                    Spacer(minLength: 0)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(slide.eyebrow.isEmpty ? "SACRED PLACES · RITUALS · GUIDANCE" : slide.eyebrow.uppercased())
+                        .font(AppFont.eyebrow(10))
+                        .tracking(2.4)
+                        .foregroundStyle(AppColor.primary.opacity(0.85))
+                        .padding(.horizontal, 20)
 
-                    VStack(alignment: .leading, spacing: AppSpacing.sm) {
-                        Text(slide.title)
-                            .font(AppFont.pageTitle())
-                            .foregroundStyle(AppColor.onDark)
-                            .shadow(color: .black.opacity(0.75), radius: 5, x: 0, y: 2)
-                            .lineLimit(3)
-                            .fixedSize(horizontal: false, vertical: true)
+                    highlightedTitle(slide.title)
+                        .font(.system(size: 32, weight: .bold, design: .serif))
+                        .lineSpacing(1)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.8)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .shadow(color: AppColor.surface.opacity(0.9), radius: 6)
+                        .padding(.leading, 20)
+                        .padding(.trailing, 40)
 
-                        Text(slide.subtitle)
-                            .font(AppFont.body())
-                            .foregroundStyle(AppColor.onDarkSecondary)
-                            .shadow(color: .black.opacity(0.8), radius: 4, x: 0, y: 2)
-                            .lineLimit(3)
-                            .fixedSize(horizontal: false, vertical: true)
+                    Text(slide.subtitle)
+                        .font(AppFont.body())
+                        .foregroundStyle(AppColor.primary)
+                        .lineSpacing(3)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .shadow(color: AppColor.surface.opacity(0.95), radius: 4)
+                        .shadow(color: AppColor.surface.opacity(0.8), radius: 10)
+                        .padding(.leading, 20)
+                        .padding(.trailing, 40)
 
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            heroPill("12k+ temples", icon: "building.columns")
+                            heroPill("Live poojas", icon: "dot.radiowaves.left.and.right")
+                            heroPill("Verified guides", icon: "checkmark.shield")
+                        }
+                        .padding(.horizontal, 20)
                     }
-                    .padding(.horizontal, 20)
-                    // Reserve space for the fixed seek bar, tags, and page controls.
-                    .padding(.bottom, 190)
-                    .padding(.trailing, 12)
+                    .padding(.top, 4)
+
+                    Spacer(minLength: 0)
                 }
+                .padding(.top, topSafeAreaInset + 86)
+                .padding(.bottom, 160)
+                .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
+                .clipped()
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
         }
     }
 
+    /// Renders the title in deep green with the final word in gold.
+    private func highlightedTitle(_ title: String) -> Text {
+        let words = title.split(separator: " ")
+        guard let last = words.last, words.count > 1 else {
+            return Text(title).foregroundStyle(AppColor.primary)
+        }
+        let head = words.dropLast().joined(separator: " ") + " "
+        return Text(head).foregroundStyle(AppColor.primary)
+            + Text(String(last)).foregroundStyle(AppColor.accent)
+    }
+
     /// Keeps the top row readable over every slide image.
     private func header(for slide: HomeHero) -> some View {
-        HStack(spacing: AppSpacing.sm) {
-            Text(slide.brandMark.isEmpty ? "श्री" : slide.brandMark)
-                .font(.system(size: 15, weight: .bold, design: .serif))
-                .foregroundStyle(AppColor.accent)
-                .frame(width: 38, height: 38)
-                .background(Circle().fill(AppColor.primary.opacity(0.65)))
-                .overlay(Circle().stroke(AppColor.accent.opacity(0.5), lineWidth: 1))
+        HStack(spacing: 10) {
+            LotusMark()
+                .stroke(AppColor.accent, style: StrokeStyle(lineWidth: 1.4, lineCap: .round, lineJoin: .round))
+                .frame(width: 44, height: 36)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(slide.brandName.isEmpty ? "SpiritualAllies" : slide.brandName)
-                    .font(AppFont.heading())
-                    .foregroundStyle(AppColor.onDark)
-                    .shadow(color: .black.opacity(0.65), radius: 3, x: 0, y: 1)
-                Text(slide.tagline.isEmpty ? "TRANSFORM · HEAL · AWAKEN" : slide.tagline.uppercased())
-                    .font(AppFont.eyebrow(10))
-                    .tracking(2.0)
-                    .foregroundStyle(AppColor.onDarkSecondary)
-                    .shadow(color: .black.opacity(0.65), radius: 3, x: 0, y: 1)
+                    .font(.system(size: 22, weight: .bold, design: .serif))
+                    .foregroundStyle(AppColor.primary)
+                Text(slide.tagline.isEmpty ? "TRANSFORM HEAL AWAKEN" : slide.tagline.uppercased())
+                    .font(AppFont.eyebrow(9))
+                    .tracking(2.4)
+                    .foregroundStyle(AppColor.primary.opacity(0.7))
             }
 
             Spacer(minLength: 8)
 
-            Button(action: onOpenPanchang) {
-                Image(systemName: "calendar")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(AppColor.accentSoft)
+            Button(action: onOpenSearch) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 22, weight: .light))
+                    .foregroundStyle(AppColor.primary)
                     .frame(width: 40, height: 40)
-                    .background(Circle().fill(AppColor.primaryDark.opacity(0.55)))
-                    .overlay(Circle().stroke(Color.white.opacity(0.18), lineWidth: 1))
             }
             .buttonStyle(.plain)
 
             Button(action: {}) {
-                Image(systemName: "bell")
-                    .font(.system(size: 17, weight: .medium))
-                    .foregroundStyle(AppColor.accentSoft)
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 22, weight: .light))
+                    .foregroundStyle(AppColor.primary)
                     .frame(width: 40, height: 40)
-                    .background(Circle().fill(AppColor.primaryDark.opacity(0.55)))
-                    .overlay(Circle().stroke(Color.white.opacity(0.18), lineWidth: 1))
             }
             .buttonStyle(.plain)
         }
     }
 
-    private func searchBar(placeholder: String, actionLabel: String) -> some View {
-        HStack(spacing: AppSpacing.sm) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 17, weight: .medium))
-                .foregroundStyle(AppColor.textSecondary)
+    private func searchBar(placeholder: String) -> some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 12) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundStyle(AppColor.accent)
 
-            TextField("", text: $searchText, prompt:
-                Text(placeholder).foregroundStyle(AppColor.textSecondary)
-            )
-            .font(AppFont.body())
-            .foregroundStyle(AppColor.textPrimary)
-            .submitLabel(.search)
-            .onSubmit(onSeek)
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Button(action: onSeek) {
-                Text(actionLabel)
-                    .font(AppFont.heading(14))
-                    .foregroundStyle(AppColor.primaryDark)
-                    .padding(.horizontal, AppSpacing.md)
-                    .padding(.vertical, 10)
-                    .background(Capsule().fill(AppColor.accent))
+                TextField("", text: $searchText, prompt:
+                    Text(placeholder).foregroundStyle(AppColor.textSecondary.opacity(0.8))
+                )
+                .font(AppFont.body())
+                .foregroundStyle(AppColor.textPrimary)
+                .submitLabel(.search)
+                .onSubmit(onSeek)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .buttonStyle(.plain)
-            .fixedSize(horizontal: true, vertical: false)
+            .padding(.horizontal, 16)
+            .frame(height: 48)
+
+            HStack(spacing: 10) {
+                HStack(spacing: 0) {
+                    searchFilter(icon: "calendar", title: "Any date")
+                    Rectangle()
+                        .fill(AppColor.cardStroke)
+                        .frame(width: 1, height: 24)
+                    searchFilter(icon: "mappin.and.ellipse", title: "India")
+                }
+                .frame(height: 48)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(AppColor.cardStroke, lineWidth: 1)
+                        )
+                )
+
+                Button(action: onSeek) {
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(Circle().fill(AppColor.accent))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 10)
+            .padding(.bottom, 10)
         }
-        .padding(.leading, 12)
-        .padding(.trailing, 12)
-        .padding(.vertical, 10)
+        .padding(.top, 6)
         .background(
-            Capsule()
-                .fill(AppColor.surface)
-                .overlay(Capsule().stroke(AppColor.cardStroke, lineWidth: 1))
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .fill(Color.white)
         )
+        .shadow(color: AppColor.shadow.opacity(0.16), radius: 16, y: 8)
+    }
+
+    private func searchFilter(icon: String, title: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .regular))
+                .foregroundStyle(AppColor.accent)
+            Text(title)
+                .font(.system(size: AppFontSize.bodySmall, weight: .regular))
+                .foregroundStyle(AppColor.textPrimary)
+                .lineLimit(1)
+            Spacer(minLength: 4)
+            Image(systemName: "chevron.down")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(AppColor.textSecondary)
+        }
+        .padding(.horizontal, 14)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func heroPill(_ title: String, icon: String) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(AppColor.accent)
+            Text(title)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(AppColor.primary)
+                .lineLimit(1)
+        }
+        .fixedSize()
+        .padding(.horizontal, 11)
+        .padding(.vertical, 8)
+        .background(Capsule().fill(Color.white.opacity(0.92)))
     }
 
     private var fixedTags: some View {
@@ -229,22 +306,18 @@ struct HeroSection: View {
         }
     }
 
+    @ViewBuilder
     private var pageIndicator: some View {
-        HStack(spacing: 6) {
-            ForEach(slides.indices, id: \.self) { index in
-                Capsule(style: .continuous)
-                    .fill(index == selectedIndex ? AppColor.accent : Color.white.opacity(0.4))
-                    .frame(width: index == selectedIndex ? 20 : 7, height: 7)
-                    .animation(.easeInOut(duration: 0.25), value: selectedIndex)
+        if slides.count > 1 {
+            HStack(spacing: 6) {
+                ForEach(slides.indices, id: \.self) { index in
+                    Capsule(style: .continuous)
+                        .fill(index == selectedIndex ? AppColor.accent : Color.white.opacity(0.6))
+                        .frame(width: index == selectedIndex ? 18 : 6, height: 6)
+                        .animation(.easeInOut(duration: 0.25), value: selectedIndex)
+                }
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(
-            Capsule()
-                .fill(Color.black.opacity(0.22))
-                .overlay(Capsule().stroke(Color.white.opacity(0.08), lineWidth: 1))
-        )
     }
 
     private func autoAdvanceLoop() async {
@@ -256,5 +329,38 @@ struct HeroSection: View {
                 selectedIndex = (selectedIndex + 1) % slides.count
             }
         }
+    }
+}
+
+/// Minimal line-art lotus used as the brand mark in the hero header.
+private struct LotusMark: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let w = rect.width, h = rect.height
+        let baseY = rect.minY + h * 0.92
+        let cx = rect.midX
+
+        func petal(tipX: CGFloat, tipY: CGFloat, spread: CGFloat) {
+            path.move(to: CGPoint(x: cx, y: baseY))
+            path.addQuadCurve(to: CGPoint(x: tipX, y: tipY),
+                              control: CGPoint(x: cx - spread, y: baseY - h * 0.45))
+            path.addQuadCurve(to: CGPoint(x: cx, y: baseY),
+                              control: CGPoint(x: tipX + spread * 0.6, y: baseY - h * 0.45))
+        }
+
+        // Center petal.
+        petal(tipX: cx, tipY: rect.minY + h * 0.05, spread: w * 0.14)
+        // Inner side petals.
+        petal(tipX: cx - w * 0.22, tipY: rect.minY + h * 0.18, spread: w * 0.18)
+        petal(tipX: cx + w * 0.22, tipY: rect.minY + h * 0.18, spread: -w * 0.04)
+        // Outer side petals.
+        petal(tipX: cx - w * 0.42, tipY: rect.minY + h * 0.42, spread: w * 0.20)
+        petal(tipX: cx + w * 0.42, tipY: rect.minY + h * 0.42, spread: -w * 0.08)
+
+        // Base leaf curve.
+        path.move(to: CGPoint(x: rect.minX + w * 0.08, y: baseY - h * 0.12))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX - w * 0.08, y: baseY - h * 0.12),
+                          control: CGPoint(x: cx, y: rect.maxY + h * 0.12))
+        return path
     }
 }

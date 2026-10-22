@@ -74,18 +74,17 @@ struct HomeView: View {
                         viewModel.searchText = prompt
                         openSearch()
                     },
+                    onOpenSearch: {
+                        searchRoute = SearchRoute(query: "")
+                    },
                     onOpenPanchang: {
                         selectedPanchang = dashboard.panchang
                         isPanchangPresented = true
                     }
                 )
 
-                if !dashboard.stats.isEmpty {
-                    StatsSection(stats: dashboard.stats)
-                }
-
                 if !dashboard.osSection.tiles.isEmpty {
-                    OSTilesSection(section: dashboard.osSection) { tile in
+                    HomeCategoryStrip(tiles: dashboard.osSection.tiles) { tile in
                         if let tab = tab(for: tile) {
                             onSelectTab(tab)
                         } else {
@@ -94,42 +93,28 @@ struct HomeView: View {
                     }
                 }
 
-                if !dashboard.intentions.items.isEmpty {
-                    SacredPicksSection(
-                        picks: dashboard.intentions,
-                        onTapItem: { selectedIntention = $0 }
-                    )
-                }
-
-                if !dashboard.howItWorks.items.isEmpty {
-                    SacredPicksSection(
-                        picks: dashboard.howItWorks,
-                        onTapItem: { selectedJourneyStep = $0 }
-                    )
+                if !dashboard.sacredPlaces.items.isEmpty {
+                    HomeFeaturedRow(picks: dashboard.sacredPlaces, onSeeAll: { onSelectTab(.places) }, onTapItem: { _ in onSelectTab(.places) })
                 }
 
                 if !dashboard.sacredPicks.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.sacredPicks, onSeeAll: { onSelectTab(.offering) }, onTapItem: { _ in onSelectTab(.offering) })
+                    HomeFeaturedRow(picks: dashboard.sacredPicks, onSeeAll: { onSelectTab(.offering) }, onTapItem: { _ in onSelectTab(.offering) })
                 }
 
                 if !dashboard.sacredEvents.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.sacredEvents)
-                }
-
-                if !dashboard.sacredPlaces.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.sacredPlaces, onSeeAll: { onSelectTab(.places) }, onTapItem: { _ in onSelectTab(.places) })
-                }
-
-                if !dashboard.pilgrimages.items.isEmpty {
-                    SacredPicksSection(picks: dashboard.pilgrimages)
+                    HomeFeaturedRow(picks: dashboard.sacredEvents)
                 }
 
                 if !dashboard.mentors.items.isEmpty {
-                    SacredPicksSection(
+                    HomeFeaturedRow(
                         picks: dashboard.mentors,
                         onSeeAll: { onSelectTab(.mentors) },
                         onTapItem: { item in selectedMentor = mentor(from: item) }
                     )
+                }
+
+                if !dashboard.intentions.items.isEmpty {
+                    HomeFeaturedRow(picks: dashboard.intentions, onTapItem: { selectedIntention = $0 })
                 }
 
                 if let panchang = dashboard.panchang {
