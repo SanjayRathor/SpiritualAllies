@@ -156,23 +156,23 @@ struct HeroSection: View {
                         .padding(.horizontal, 20)
 
                     highlightedTitle(slide.title)
-                        .font(.system(size: 32, weight: .bold, design: .serif))
-                        .lineSpacing(1)
+                        .font(.system(size: 31, weight: .semibold, design: .serif))
+                        .tracking(-0.35)
+                        .lineSpacing(2)
                         .lineLimit(3)
                         .minimumScaleFactor(0.8)
                         .fixedSize(horizontal: false, vertical: true)
-                        .shadow(color: AppColor.surface.opacity(0.9), radius: 6)
+                        .shadow(color: Color.white.opacity(0.45), radius: 1, y: 1)
                         .padding(.leading, 20)
                         .padding(.trailing, 40)
 
                     Text(slide.subtitle)
-                        .font(AppFont.body())
+                        .font(.system(size: AppFontSize.body, weight: .regular, design: .rounded))
                         .foregroundStyle(AppColor.primary)
                         .lineSpacing(3)
                         .lineLimit(3)
                         .fixedSize(horizontal: false, vertical: true)
-                        .shadow(color: AppColor.surface.opacity(0.95), radius: 4)
-                        .shadow(color: AppColor.surface.opacity(0.8), radius: 10)
+                        .shadow(color: Color.white.opacity(0.4), radius: 1, y: 1)
                         .padding(.leading, 20)
                         .padding(.trailing, 40)
 
@@ -311,7 +311,11 @@ struct HeroSection: View {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(Color.white)
         )
-        .shadow(color: AppColor.shadow.opacity(0.16), radius: 16, y: 8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(Color.white.opacity(0.75), lineWidth: 1)
+        )
+        .shadow(color: AppColor.primaryDark.opacity(0.13), radius: 18, y: 9)
     }
 
     private func searchFilter(icon: String, title: String, isLoading: Bool = false) -> some View {
@@ -353,7 +357,9 @@ struct HeroSection: View {
         .fixedSize()
         .padding(.horizontal, 11)
         .padding(.vertical, 8)
-        .background(Capsule().fill(Color.white.opacity(0.92)))
+        .background(Capsule().fill(Color.white.opacity(0.94)))
+        .overlay(Capsule().stroke(Color.white.opacity(0.75), lineWidth: 0.8))
+        .shadow(color: AppColor.primaryDark.opacity(0.06), radius: 5, y: 2)
     }
 
     private var fixedTags: some View {

@@ -32,7 +32,7 @@ struct HomeCategoryStrip: View {
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(AppColor.surface)
-                .shadow(color: AppColor.shadow.opacity(0.10), radius: 12, y: 6)
+                .shadow(color: AppColor.primaryDark.opacity(0.08), radius: 16, y: 8)
         )
         .padding(.horizontal, 16)
     }
@@ -71,28 +71,34 @@ struct HomeFeaturedRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
+            HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
                     Label(picks.title, systemImage: sectionIcon)
-                        .font(AppFont.sectionTitle())
+                        .font(.system(size: 20, weight: .semibold, design: .serif))
                         .foregroundStyle(AppColor.primaryDark)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                     if !picks.subtitle.isEmpty {
                         Text(picks.subtitle)
                             .font(AppFont.bodySmall())
                             .foregroundStyle(AppColor.textSecondary)
-                            .lineLimit(2)
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 Spacer(minLength: 10)
-                Button(action: onSeeAll) {
-                    HStack(spacing: 5) {
-                        Text("View all")
-                        Image(systemName: "arrow.right")
+                if !picks.seeAllLabel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Button(action: onSeeAll) {
+                        HStack(spacing: 5) {
+                            Text("View all")
+                            Image(systemName: "arrow.right")
+                        }
+                        .font(.system(size: AppFontSize.label, weight: .semibold))
+                        .foregroundStyle(AppColor.accent)
                     }
-                    .font(AppFont.label())
-                    .foregroundStyle(AppColor.accent)
+                    .buttonStyle(.plain)
+                    .padding(.top, 3)
                 }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, 20)
 
@@ -175,7 +181,7 @@ struct HomeFeaturedRow: View {
         .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(AppColor.surface))
         .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(AppColor.cardStroke, lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: AppColor.shadow.opacity(0.09), radius: 10, y: 5)
+        .shadow(color: AppColor.primaryDark.opacity(0.08), radius: 14, y: 7)
     }
 
     private var sectionIcon: String {
@@ -183,6 +189,7 @@ struct HomeFeaturedRow: View {
         if title.contains("offering") { return "hands.sparkles" }
         if title.contains("mentor") || title.contains("purohit") { return "person.2" }
         if title.contains("event") { return "calendar" }
+        if title.contains("intention") { return "sparkles" }
         return "building.columns"
     }
 }
